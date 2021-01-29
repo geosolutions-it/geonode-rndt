@@ -1,6 +1,6 @@
 # geonode-rndt
 
-Geonode-RNDT is a Django App to let GeoNode be able to expose the metadata complaint to the RNDT standard
+Geonode-RNDT is a Django App to let GeoNode be able to expose the metadata compliant to the RNDT standard
 
 Detailed information on the definition of RNDT are available at this [link](https://geodati.gov.it/geoportale/)
 
