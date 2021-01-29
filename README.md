@@ -10,7 +10,7 @@ Quick start
 -----------
 1. Install the application as requirement
 ```
-pip install -e git+https://github.com/geosolutions-it/geonode-rndt
+pip install -e git+https://github.com/geosolutions-it/geonode-rndt@setup_minimum_django_req#egg=rndt
 ```
 
 2. Add "rndt" to your INSTALLED_APPS setting like this::
