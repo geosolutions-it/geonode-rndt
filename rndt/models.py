@@ -25,7 +25,7 @@ class GroupProfileRNDT(models.Model):
     pa = models.ForeignKey('PubblicaAmministrazione', related_name='pa', on_delete=models.CASCADE)
 
     def __str__(self):
-        return f"{self.pa}: {self.group_profile}"
+        return f"{self.group_profile}: {self.pa.ipa}"
 
     def as_dict(self):
         return {
