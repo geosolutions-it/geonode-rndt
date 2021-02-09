@@ -17,20 +17,18 @@ class UUIDHandler:
 
         newuuid = ""
         uuid_ipa = self._extract_ipa_from_uuid()
-        if uuid_ipa:
+        if not layer_ipa:
+            newuuid = self.instance.uuid
+        elif layer_ipa in self.instance.uuid:
+            newuuid = self.instance.uuid
+        elif uuid_ipa:
             if layer_ipa == uuid_ipa:
                 newuuid = self.instance.uuid
             else:
-                # TODO aggiungere check se l'ipa che è trovato è diverso da quello dell'UUID, è da
-                # mantenere quello nuovo
                 newuuid = re.sub(uuid_ipa, layer_ipa, self.instance.uuid)
         else:
-            if not layer_ipa:
-                newuuid = self.instance.uuid
-            elif layer_ipa in self.instance.uuid:
-                newuuid = self.instance.uuid
-            else:
-                newuuid = f"{layer_ipa}:{self.instance.uuid}"
+            newuuid = f"{layer_ipa}:{self.instance.uuid}"
+            
         return newuuid[:36]
 
     def get_layer_ipa(self):
