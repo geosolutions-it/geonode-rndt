@@ -62,7 +62,7 @@ class TestUUIDHandlerTestCase(unittest.TestCase):
 
     def test_uuidhandler_should_extract_the_correct_ipa_code_if_exists(self):
         self.sut.uuid = "c_123:uuid"
-        actual = UUIDHandler(self.sut)._extract_ipa()
+        actual = UUIDHandler(self.sut)._extract_ipa_from_uuid()
         self.assertEqual("c_123", actual)
 
     def test_uuidhandler_should_extract_the_correct_uuid_code_if_exists(self):
@@ -72,10 +72,11 @@ class TestUUIDHandlerTestCase(unittest.TestCase):
 
     def test_uuidhandler_should_extract_none_ipa_code_if_not_exists(self):
         self.sut.uuid = "d1fbf97f-e44a-4c60-87e2-56dc"
-        actual = UUIDHandler(self.sut)._extract_ipa()
+        actual = UUIDHandler(self.sut)._extract_ipa_from_uuid()
         self.assertFalse(actual)
 
     def test_uuidhandler_update_the_ipa_code_if_is_changed(self):
-        self.sut.uuid = "123abc456"
+        self.sut.uuid = "c123:abcdef"
+        self.sut.group.groupprofile.groupprofilerndt.pa.ipa = "c_345"
         actual = UUIDHandler(self.sut).create_uuid()
-        self.assertFalse(actual)
+        self.assertEqual("c_345:abcdef", actual)

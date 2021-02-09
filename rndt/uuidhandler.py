@@ -8,34 +8,33 @@ class UUIDHandler:
         self.instance = instance
 
     def create_uuid(self):
-        ipa_found = self.evaluate_ipa_code()
-        return self._generate_uuid(ipa_found)
+        layer_ipa = self.get_layer_ipa()
+        return self._generate_uuid(layer_ipa)
 
-    def _generate_uuid(self, ipa_found):
+    def _generate_uuid(self, layer_ipa):
         if not self.instance.uuid:
-            return self._uuid_does_not_exists(ipa_found)
+            return self._uuid_does_not_exists(layer_ipa)
 
         newuuid = ""
-        ipa_available = self._extract_ipa()
-        if ipa_available:
-            if ipa_found == ipa_available:
+        uuid_ipa = self._extract_ipa_from_uuid()
+        if uuid_ipa:
+            if layer_ipa == uuid_ipa:
                 newuuid = self.instance.uuid
             else:
                 # TODO aggiungere check se l'ipa che è trovato è diverso da quello dell'UUID, è da
                 # mantenere quello nuovo
-                newuuid = f"{ipa_found}:{self.instance.uuid}"
+                newuuid = re.sub(uuid_ipa, layer_ipa, self.instance.uuid)
         else:
-            if not ipa_found:
+            if not layer_ipa:
                 newuuid = self.instance.uuid
-            elif ipa_found in self.instance.uuid:
+            elif layer_ipa in self.instance.uuid:
                 newuuid = self.instance.uuid
             else:
-                newuuid = f"{ipa_found}:{self.instance.uuid}"
+                newuuid = f"{layer_ipa}:{self.instance.uuid}"
         return newuuid[:36]
 
-    def evaluate_ipa_code(self):
+    def get_layer_ipa(self):
         if self.instance.group is not None:
-            #  gp = group profile
             try:
                 logging.debug("Retrieving ipa if associated")
                 return self.instance.group.groupprofile.groupprofilerndt.pa.ipa
@@ -44,13 +43,16 @@ class UUIDHandler:
                 pass
         return None
 
-    def _uuid_does_not_exists(self, ipa_found):
-        if not self.instance.uuid and not ipa_found:
-            return f"{uuid.uuid1()}"
-        elif not self.instance.uuid and ipa_found:
-            return f"{ipa_found}:{uuid.uuid1()}"
+    def _get_previous_ipa(self):
+        return "12345"
 
-    def _extract_ipa(self):
+    def _uuid_does_not_exists(self, layer_ipa):
+        if not self.instance.uuid and not layer_ipa:
+            return f"{uuid.uuid1()}"
+        elif not self.instance.uuid and layer_ipa:
+            return f"{layer_ipa}:{uuid.uuid1()}"
+
+    def _extract_ipa_from_uuid(self):
         pattern = re.compile("^\W*(\w+)\W*:")
         return self.__regex(pattern)
 
