@@ -41,9 +41,6 @@ class UUIDHandler:
                 pass
         return None
 
-    def _get_previous_ipa(self):
-        return "12345"
-
     def _uuid_does_not_exists(self, layer_ipa):
         if not self.instance.uuid and not layer_ipa:
             return f"{uuid.uuid1()}"
