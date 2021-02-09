@@ -16,7 +16,7 @@ class UUIDHandler:
             return self._uuid_does_not_exists(layer_ipa)
 
         newuuid = ""
-        uuid_ipa = self._extract_ipa_from_uuid()
+        uuid_ipa = self.extract_ipa_from_uuid(self.instance.uuid)
         if not layer_ipa:
             newuuid = self.instance.uuid
         elif layer_ipa in self.instance.uuid:
@@ -25,7 +25,7 @@ class UUIDHandler:
             if layer_ipa == uuid_ipa:
                 newuuid = self.instance.uuid
             else:
-                newuuid = re.sub(uuid_ipa, layer_ipa, self.instance.uuid)
+                newuuid = self.replace_uuid(layer_ipa, uuid_ipa, self.instance.uuid)
         else:
             newuuid = f"{layer_ipa}:{self.instance.uuid}"
             
@@ -47,14 +47,18 @@ class UUIDHandler:
         elif not self.instance.uuid and layer_ipa:
             return f"{layer_ipa}:{uuid.uuid1()}"
 
-    def _extract_ipa_from_uuid(self):
+    @staticmethod
+    def replace_uuid(new_ipa, old_ipa, str_to_replace):
+        return re.sub(old_ipa, new_ipa, str_to_replace)
+
+    @staticmethod
+    def extract_ipa_from_uuid(instance_uuid):
         pattern = re.compile("^\W*(\w+)\W*:")
-        return self.__regex(pattern)
+        match = re.findall(pattern, instance_uuid)
+        return match[0] if match else False
 
-    def _extract_uuid(self):
+    @staticmethod
+    def extract_uuid(instance_uuid):
         pattern = re.compile(":\W*(\w+)\W*$")
-        return self.__regex(pattern)
-
-    def __regex(self, pattern):
-        match = re.findall(pattern, self.instance.uuid)
+        match = re.findall(pattern, instance_uuid)
         return match[0] if match else False
