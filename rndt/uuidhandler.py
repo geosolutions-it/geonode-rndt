@@ -49,7 +49,7 @@ class UUIDHandler:
 
     @staticmethod
     def replace_uuid(new_ipa, old_ipa, str_to_replace):
-        return re.sub(old_ipa, new_ipa, str_to_replace)
+        return re.sub(old_ipa, new_ipa, str_to_replace)[:36]
 
     @staticmethod
     def extract_ipa_from_uuid(instance_uuid):
