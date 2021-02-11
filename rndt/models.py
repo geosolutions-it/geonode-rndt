@@ -2,8 +2,10 @@ from django.db import models
 from django.db.models.signals import post_save
 from geonode.layers.models import ResourceBase
 from geonode.groups.models import GroupProfile
+from geonode.base.models import Link
 from django.dispatch import receiver
 from rndt.uuidhandler import UUIDHandler
+from urllib.parse import urlparse, ParseResult, parse_qs, urlencode, urlsplit, quote
 
 
 class PubblicaAmministrazione(models.Model):
@@ -85,11 +87,24 @@ def _group_post_save(sender, instance, raw, **kwargs):
     current_ipa, ipa_to_replace = instance.rb_to_update
     if instance.ipa_has_changed and ipa_to_replace:
         resources = ResourceBase.objects.filter(uuid__startswith=ipa_to_replace)
-        for resouce in resources:
-            resouce.uuid = UUIDHandler.replace_uuid(
-                current_ipa, ipa_to_replace, resouce.uuid
+        for resource in resources:
+            resource.uuid = UUIDHandler.replace_uuid(
+                current_ipa, ipa_to_replace, resource.uuid
             )
-            resouce.save()
+            new_uuid = resource.uuid
+            resource.save()
+            for link in Link.objects.filter(resource_id=resource.id).all():
+                url = link.url
+                param, newvalue = 'id', new_uuid
+                parsed = urlsplit(url)
+                query_dict = parse_qs(parsed.query)
+                if 'id' in query_dict.keys():
+                    query_dict[param][0] = newvalue
+                    query_new = urlencode(query_dict, doseq=True)
+                    parsed=parsed._replace(query=query_new)
+                    link.url = (parsed.geturl())
+                    link.save()
         r_updated = ",".join([str(r.id) for r in resources])
         print(f"Following resources id has been updated : {r_updated}")
- 
+    #updating Links
+        
