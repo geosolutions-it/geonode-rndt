@@ -25,10 +25,12 @@ class UUIDHandler:
             if layer_ipa == uuid_ipa:
                 newuuid = self.instance.uuid
             else:
-                newuuid = self.replace_uuid(layer_ipa, uuid_ipa, self.instance.uuid)
+                newuuid = self.replace_uuid(
+                    layer_ipa, uuid_ipa, self.instance.uuid
+                )
         else:
             newuuid = f"{layer_ipa}:{self.instance.uuid}"
-            
+
         return newuuid[:36]
 
     def get_layer_ipa(self):
@@ -36,7 +38,7 @@ class UUIDHandler:
             try:
                 logging.debug("Retrieving ipa if associated")
                 return self.instance.group.groupprofile.groupprofilerndt.pa.ipa
-            except Exception as e:
+            except Exception:
                 logging.debug("No ipa found for the selected layer")
                 pass
         return None

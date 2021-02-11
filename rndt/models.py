@@ -3,12 +3,9 @@ from django.db.models import signals
 from django.db.models.signals import post_save
 from geonode.layers.models import Layer, ResourceBase
 from geonode.groups.models import GroupProfile
-from geonode.base.models import Link, resourcebase_post_save
+from geonode.base.models import  resourcebase_post_save
 from django.dispatch import receiver
 from rndt.uuidhandler import UUIDHandler
-from urllib.parse import urlparse, ParseResult, parse_qs, urlencode, urlsplit, quote
-import django.core.signals
-from geonode.catalogue.models import catalogue_post_save
 
 
 class PubblicaAmministrazione(models.Model):
@@ -31,10 +28,7 @@ class PubblicaAmministrazione(models.Model):
         # check if the ipa code is changed
         self.ipa_has_changed = self._has_changed()
         if self.ipa_has_changed:
-            self.rb_to_update = (
-                self.ipa,
-                self.__previous_ipa
-            )
+            self.rb_to_update = (self.ipa, self.__previous_ipa)
         super(PubblicaAmministrazione, self).save(*args, **kwargs)
 
     def _has_changed(self):
@@ -98,7 +92,7 @@ def _group_post_save(sender, instance, raw, **kwargs):
 
         r_updated = ",".join([str(r.id) for r in resources])
         print(f"Following resources id has been updated : {r_updated}")
-    #updating Links
-        
+    # updating Links
+
 
 signals.post_save.connect(resourcebase_post_save, sender=ResourceBase)
