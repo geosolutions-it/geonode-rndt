@@ -5,7 +5,7 @@
   {% if facet_type == 'layers' %}
     {% verbatim %}
       <li ng-repeat="pa in pubblica_amministrazione">
-        <a data-value="{{ pa.ipa }}" data-filter="pa_ipa__in" title="{{ pa.name }}"
+        <a data-value="{{ pa.ipa }}" data-filter="uuid__startswith" title="{{ pa.name }}"
          ng-click="multiple_choice_listener($event)" class="{{pa.active}}">{{ pa.name | limitTo: 25 }}{{ pa.name.length > 25 ? '...' : ''}}
         </a>
       </li>
@@ -13,7 +13,7 @@
   {% else %}
     {% verbatim %}
       <li ng-repeat="pa in pubblica_amministrazione">
-        <a data-value="{{ pa.ipa }}" data-filter="pa_ipa__in" title="{{ pa.name }}"
+        <a data-value="{{ pa.ipa }}" data-filter="uuid__startswith" title="{{ pa.name }}"
          ng-click="multiple_choice_listener($event)" class="{{pa.active}}">{{ pa.name | limitTo: 25 }}{{ pa.name.length > 25 ? '...' : ''}}
         </a>
       </li>
