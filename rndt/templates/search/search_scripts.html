@@ -36,6 +36,7 @@
   HAYSTACK_SEARCH = "{{ HAYSTACK_SEARCH }}".toLowerCase() === "true";
   HAYSTACK_FACET_COUNTS = "{{ HAYSTACK_FACET_COUNTS }}".toLowerCase() === "true";
   CLIENT_RESULTS_LIMIT = {{ CLIENT_RESULTS_LIMIT }};
+  PUBBLICA_AMMINISTRAZIONE_ENDPOINT = '{% url 'api_dispatch_list' api_name='api' resource_name='pubblica_amministrazione' %}';
 
   // Register autocomplete for text filters
   $(document).ready(function() {

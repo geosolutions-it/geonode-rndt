@@ -4,8 +4,8 @@ from geonode.api.urls import api
 
 api.register(PubblicaAmministrazioneResource())
 
-x = PubblicaAmministrazioneResource()
+pubblica_amministrazione = PubblicaAmministrazioneResource()
 
 urlpatterns = [
-    url(r'^(?P<api_name>api)/', include(x.urls), name="pubblica_amministrazione"),
+    url(r'^(?P<api_name>api)/', include(pubblica_amministrazione.urls), name="pubblica_amministrazione"),
 ]
