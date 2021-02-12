@@ -24,7 +24,7 @@ NOTE: be sure to put it as first app
 
 3.  in `geonode.settings.py` set `DIR` for `TEMPLATES` as `[]` in order to let the app overrides the templates
 
-4.  in order to let the app overrides some static files move the `AppDirectoriesFinder` as first choice in `geonode.settings.py` by setting `STATICFILES_FINDERS` like this:
+4.  in order to let the app overrides some static files move the `AppDirectoriesFinder` as first choice in `geonode.settings.py` in `STATICFILES_FINDERS` settings. The output should be something like this:
 ```
 STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
@@ -35,3 +35,4 @@ STATICFILES_FINDERS = (
 
 5. Run ``python manage.py migrate`` to create the RNDT models.
 
+To uninstall the app remove `rndt` from  `geonode.settings.py`, restart the server. If needed made an hard refresh to let the browser reload the js/css/html files (windows: CTRL+ SHIFT+R | Mac: CMD+SHIFT+R)
