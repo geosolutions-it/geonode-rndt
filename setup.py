@@ -38,6 +38,7 @@ setup(
         "Topic :: Internet :: WWW/HTTP :: Dynamic Content",
     ],
     packages=find_packages(),
+    package_data={'':['*.html']},
     include_package_data=True,
     install_requires=read_file("requirements.txt").splitlines(),
 )

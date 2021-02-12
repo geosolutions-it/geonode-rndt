@@ -16,9 +16,13 @@ pip install -e git+https://github.com/geosolutions-it/geonode-rndt@master#egg=rn
 2. Add "rndt" to your INSTALLED_APPS setting like this::
 
     INSTALLED_APPS = [
-        ...
         'rndt',
+        ...
     ]
 
-3. Run ``python manage.py migrate`` to create the RNDT models.
+NOTE: be sure to put it as first app
+
+3.  in `geonode.settings.py` set `DIR` for `TEMPLATES` as `[]` in order to let the app overrides the templates
+
+4. Run ``python manage.py migrate`` to create the RNDT models.
 
