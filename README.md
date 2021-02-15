@@ -34,6 +34,7 @@ STATICFILES_FINDERS = (
 )
 
 ```
+<<<<<<< HEAD
 5. enable RNDT context processors in `geonode.settings.py` by adding the following line in `TEMPLATES`:
 ```
 'OPTIONS': {
@@ -58,3 +59,9 @@ Some custom environment variables are avaiable:
 DISABLE_LAYER_CONSTRAINTS (default `true`)
 
 If `true` will hide from the Layers Metadata edit wizard page, the contraints in the tab `Location and Licenses`
+=======
+
+5. Run ``python manage.py migrate`` to create the RNDT models.
+
+To uninstall the app remove `rndt` from  `geonode.settings.py`, restart the server. If needed made an hard refresh to let the browser reload the js/css/html files (windows: CTRL+ SHIFT+R | Mac: CMD+SHIFT+R)
+>>>>>>> e4b6599fdc98790b86a70b89620582485f735ad2
