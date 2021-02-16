@@ -1,16 +1,18 @@
 {% extends "layouts/panels.html" %}
-{% block body_outer %}
-hello world
-    <div id="additionalInfo" class="tab-pane fade">
-      <div class="panel-group">
-        <div class="panel panel-default">
-          <div class="panel-body">
-            <div style="padding: 15px">
-              hello world!
-            </div>
-          </div>
-        </div>
+{% load floppyforms %}
+{% block layer_constraints %}
+{% if not DISABLE_LAYER_CONSTRAINTS %}
+  <div class="col-lg-4">
+      <div>
+          <span><label for="{{ layer_form.restriction_code_type|id }}">{{ layer_form.restriction_code_type.label }}</label></span>
+          <!--<p class="xxs-font-size">(Limitation/s placed upon the access or use of data)</p>-->
+          {{ layer_form.restriction_code_type }}
       </div>
-    </div>
-
- {% endblock %}
+      <div>
+          <span><label for="{{ layer_form.constraints_other|id }}">{{ layer_form.constraints_other.label }}</label></span>
+          <!--<p class="xxs-font-size">(Other restrictions and legal prerequisites for accessing or use data and metadata)</p>-->
+          {{ layer_form.constraints_other }}
+      </div>
+  </div>
+{% endif %}
+{% endblock layer_constraints %}

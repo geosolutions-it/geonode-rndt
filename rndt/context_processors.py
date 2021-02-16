@@ -1,7 +1,7 @@
+import ast
+import os
 from ast import literal_eval
 
-
-import ast, os
 
 def rndt_tags(request):
     return {
