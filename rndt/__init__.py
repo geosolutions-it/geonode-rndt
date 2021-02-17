@@ -1,4 +1,4 @@
-VERSION = (0, 1, 7)
+VERSION = (0, 1, 8)
 __version__ = ".".join([str(i) for i in VERSION])
 __author__ = "geosolutions-it"
 __email__ = "info@geosolutionsgroup.com"
