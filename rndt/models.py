@@ -1,5 +1,6 @@
 from django.db import models
 from geonode.groups.models import GroupProfile
+from geonode.layers.models import Layer
 
 
 class PubblicaAmministrazione(models.Model):
@@ -33,3 +34,17 @@ class GroupProfileRNDT(models.Model):
     class Meta:
         ordering = ("pa",)
         verbose_name_plural = "Group Profile RNDT"
+
+class LayerRNDT(models.Model):
+    layer = models.OneToOneField(Layer, on_delete=models.CASCADE)
+    constraints_other = models.TextField(default=None, null=True)
+
+    def __str__(self):
+        return f"{self.layer.title}: {self.constraints_other}"
+
+    def as_dict(self):
+        return {"layer": self.layer.id, "constraints_other": self.constraints_other}
+
+    class Meta:
+        ordering = ("layer", "constraints_other")
+        verbose_name_plural = "Layer RNDT"
