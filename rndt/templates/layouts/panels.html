@@ -60,7 +60,48 @@
         <div class="panel-group">
             <div class="panel panel-default">
                 <div class="panel-body">
-                Placeholder text, all the Contraints required will be implemented with Django forms
+                    <div class="row">
+                        <div class="col">
+                            <div id="additionalcontraintsInfo" class="container-fluid">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-4">
+                            <span><label for="{{ LayerRNDTForm.limitation_public_access|id }}">{{ LayerRNDTForm.limitation_public_access.label }}</label></span>
+                            <!--<p class="xxs-font-size">(Name by which the cited resource is known)</p>-->
+                            <br>
+                            <div>
+                            {{ LayerRNDTForm.limitation_public_access }}
+                            </div>
+                        </div>
+                        <div class="col-lg-5">
+                            <span><label>{% trans "Please select one for" %} ConditionsApplyingToAccessAndUse:</label></span>
+                            <br>
+                            <input type="radio" id="age1" name="rndt_constr_choice" value="1" checked>
+                            <label for="age1">{% trans "Choices" %}</label>
+                            <input type="radio" id="age2" name="rndt_constr_choice" value="2">
+                            <label for="age2">{% trans "text" %}</label><br>
+                            <div class="rndt_choice" id="rndt_choice_1">
+                                <!--<p class="xxs-font-size">(Name by which the cited resource is known)</p>-->
+                                {{ LayerRNDTForm.condition }}
+                            </div>
+                            <div class="rndt_choice" id="rndt_choice_2" hidden>
+                                <!--<p class="xxs-font-size">(Name by which the cited resource is known)</p>-->
+                                {{ LayerRNDTForm.free_text }}
+                            </div>
+                            <script type="text/javascript"> 
+                                $(document).ready(function() {
+                                    $("input[name$='rndt_constr_choice']").click(function() {
+                                        var choice = $(this).val();
+                                        $("div.rndt_choice").hide();
+                                        $("#rndt_choice_" + choice).show();
+                                    });
+                                });
+                            </script>
+                        </div>
+                    </div>
+                    <br>
                 </div>
             </div>
         </div>

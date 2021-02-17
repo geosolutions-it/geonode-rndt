@@ -1,19 +1,12 @@
 from django.db import models
 from django.db.models import signals
 from django.db.models.signals import post_save
+from django.dispatch import receiver
+from geonode.base.models import resourcebase_post_save
 from geonode.groups.models import GroupProfile
 from geonode.layers.models import Layer, ResourceBase
 
-<<<<<<< HEAD
-from django.dispatch import receiver
-from geonode.base.models import resourcebase_post_save
-
 from rndt.uuidhandler import UUIDHandler
-
-=======
-from geonode.layers.models import Layer
-
->>>>>>> 266c934310ddaa4735a88fb7495adc396b1a8223
 
 
 class PubblicaAmministrazione(models.Model):
