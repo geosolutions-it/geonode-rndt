@@ -2,6 +2,7 @@ import json
 import re
 
 from django.http import HttpResponse
+from geonode.base.models import ThesaurusKeywordLabel
 from geonode.layers.views import (_PERMISSION_MSG_METADATA, _resolve_layer,
                                   check_keyword_write_perms)
 from geonode.layers.views import layer_metadata as geonode_layer_view
@@ -64,13 +65,23 @@ def layer_metadata(
                 available.constraints_other = constraints_other
                 #  save the new value in the DB
                 available.save()
-       
-        
+
         #  get the value to be saved in constraints_other
         layer_constraint = (
             items["free_text"]
             if items["use_constraints"] == "freetext"
             else items["use_constraints"]
         )
-        #  do something
+        #  cloning acutal request to make it mutable
+        request.POST = request.POST.copy()
+        #  oerride fields needed for rndt
+        request.POST['resource-restriction_code_type'] = '8'
+        if layer_constraint.isnumeric():
+            klobj = ThesaurusKeywordLabel.objects.get(id=layer_constraint)
+            request.POST['resource-constraints_other'] = f"{klobj.keyword.about}+{klobj.label}"
+        else:
+            request.POST['resource-constraints_other'] = layer_constraint
+        #  reset the request as immutable
+        request.POST._mutable = False
+
     return geonode_layer_view(request, layername, template, ajax, *args, **kwargs)
