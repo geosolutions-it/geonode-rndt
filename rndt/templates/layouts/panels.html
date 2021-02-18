@@ -3,6 +3,10 @@
 {% load static %}
 {% load floppyforms %}
 
+{% block additional_scripts %}
+<script type="text/javascript" src="{% static "rndt/js/forms/rndt_form.js" %}"></script>
+{% endblock additional_scripts %}
+
 {% block layer_constraints %}
 {% if not DISABLE_LAYER_CONSTRAINTS %}
   <div class="col-lg-4">
@@ -35,7 +39,7 @@
           <a>{% trans "Dataset Attributes" %}</a>
       </li>
       <li data-step="5"  data-toggle="tab" href="#additionalcontraints">
-          <a>{% trans "Additional Contraints" %}</a>
+          <a>{% trans "Additional info" %}</a>
       </li>
   </ul>
   {% endblock breadcrumbs %}
@@ -58,50 +62,35 @@
  {% block other_tab %}
     <div id="additionalcontraints" class="tab-pane fade">
         <div class="panel-group">
-            <div class="panel panel-default">
-                <div class="panel-body">
-                    <div class="row">
-                        <div class="col">
-                            <div id="additionalcontraintsInfo" class="container-fluid">
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-lg-4">
-                            <span><label for="{{ LayerRNDTForm.limitation_public_access|id }}">{{ LayerRNDTForm.limitation_public_access.label }}</label></span>
-                            <!--<p class="xxs-font-size">(Name by which the cited resource is known)</p>-->
-                            <br>
+            <div class="col-xs-12 col-lg-8">
+                <div class="panel panel-default">
+                    <div class="panel-heading">{% trans "Data Contraints" %}</div>
+                        <div class="panel-body">
                             <div>
-                            {{ LayerRNDTForm.limitation_public_access }}
+                                <span><label for="{{ LayerRNDTForm.limitation_public_access }}">{% trans "Access constraints" %}</label></span>
+                                {{ LayerRNDTForm.access_contraints }}
                             </div>
-                        </div>
-                        <div class="col-lg-5">
-                            <span><label>{% trans "Please select one for" %} ConditionsApplyingToAccessAndUse:</label></span>
-                            <br>
-                            <input type="radio" id="age1" name="rndt_constr_choice" value="1" checked>
-                            <label for="age1">{% trans "Choices" %}</label>
-                            <input type="radio" id="age2" name="rndt_constr_choice" value="2">
-                            <label for="age2">{% trans "text" %}</label><br>
-                            <div class="rndt_choice" id="rndt_choice_1">
-                                <!--<p class="xxs-font-size">(Name by which the cited resource is known)</p>-->
-                                {{ LayerRNDTForm.condition }}
+                            <div>
+                                <span><label>{% trans "Use constraints" %}</label></span>
+                                {{ LayerRNDTForm.use_contraints }}
                             </div>
-                            <div class="rndt_choice" id="rndt_choice_2" hidden>
-                                <!--<p class="xxs-font-size">(Name by which the cited resource is known)</p>-->
+                            <div id="free_text" hidden>
+                                <span><label>{% trans "Free text" %}</label></span>
                                 {{ LayerRNDTForm.free_text }}
                             </div>
-                            <script type="text/javascript"> 
+                            <script type="text/javascript">
                                 $(document).ready(function() {
-                                    $("input[name$='rndt_constr_choice']").click(function() {
-                                        var choice = $(this).val();
-                                        $("div.rndt_choice").hide();
-                                        $("#rndt_choice_" + choice).show();
+                                    $("select[name$='use_contraints']").click(function() {
+                                        var x = $(this).val();
+                                        if ($(this).val() == 'freetext') {
+                                            $("#free_text").show();
+                                        } else {
+                                            $("#free_text").hide();
+                                        }
                                     });
                                 });
                             </script>
-                        </div>
                     </div>
-                    <br>
                 </div>
             </div>
         </div>

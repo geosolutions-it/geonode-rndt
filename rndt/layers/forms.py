@@ -6,25 +6,47 @@ from geonode.base.models import ThesaurusKeywordLabel
 
 
 class LayerRNDTForm(forms.Form):
-
     class Meta:
-        fields = ['limitation_public_access', 'condition', 'free_text']
+        fields = ["access_contraints", "use_contraints", "free_text"]
 
-    lang = 'en' if not hasattr(settings, 'THESAURUS_DEFAULT_LANG') else settings.THESAURUS_DEFAULT_LANG
+    lang = (
+        "en"
+        if not hasattr(settings, "THESAURUS_DEFAULT_LANG")
+        else settings.THESAURUS_DEFAULT_LANG
+    )
 
-    limitation_public_access = models.ModelChoiceField(
-            label=_('LimitationsOnPublicAccess'),
-            required=False,
-            queryset=ThesaurusKeywordLabel.objects.filter(keyword__thesaurus__identifier="LimitationsOnPublicAccess").filter(lang=lang),
-        )
+    access_contraints = models.ModelChoiceField(
+        label=_("LimitationsOnPublicAccess"),
+        required=False,
+        queryset=ThesaurusKeywordLabel.objects.filter(
+            keyword__thesaurus__identifier="LimitationsOnPublicAccess"
+        ).filter(lang=lang),
+    )
 
-    condition = models.ModelChoiceField(
-            label=_('ConditionsApplyingToAccessAndUse choices'),
-            required=False,
-            queryset=ThesaurusKeywordLabel.objects.filter(keyword__thesaurus__identifier="ConditionsApplyingToAccessAndUse").filter(lang=lang),
-        )
+    use_contraints = forms.ChoiceField(
+        label=_("ConditionsApplyingToAccessAndUse choices"), required=False
+    )
 
     free_text = forms.CharField(
-        label=_('ConditionsApplyingToAccessAndUse free text'),
+        label=_("ConditionsApplyingToAccessAndUse free text"),
         widget=forms.Textarea,
-        required=False)
+        required=False,
+    )
+
+    def __init__(self, *args, **kwargs):
+        super(LayerRNDTForm, self).__init__(*args, *kwargs)
+        lang = (
+            "en"
+            if not hasattr(settings, "THESAURUS_DEFAULT_LANG")
+            else settings.THESAURUS_DEFAULT_LANG
+        )
+        # getting the default choices from the thesaurus
+        choices_usability = ThesaurusKeywordLabel.objects.filter(
+            keyword__thesaurus__identifier="ConditionsApplyingToAccessAndUse"
+        ).filter(lang=lang)
+
+        choices_as_tuple = [(x.id, x.label) for x in choices_usability]
+        # adding custom choices in order to let the free-text textarea appear when selected 
+        default_choices = [("", "---------"), *choices_as_tuple, ("freetext", "free")]
+
+        self.fields["use_contraints"].choices = default_choices
