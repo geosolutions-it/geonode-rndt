@@ -7,7 +7,7 @@ from geonode.base.models import ThesaurusKeywordLabel
 
 class LayerRNDTForm(forms.Form):
     class Meta:
-        fields = ["access_contraints", "use_contraints", "free_text"]
+        fields = ["access_contraints", "use_constraints", "free_text"]
 
     lang = (
         "en"
@@ -23,7 +23,7 @@ class LayerRNDTForm(forms.Form):
         ).filter(lang=lang),
     )
 
-    use_contraints = forms.ChoiceField(
+    use_constraints = forms.ChoiceField(
         label=_("ConditionsApplyingToAccessAndUse choices"), required=False
     )
 
@@ -47,6 +47,6 @@ class LayerRNDTForm(forms.Form):
 
         choices_as_tuple = [(x.id, x.label) for x in choices_usability]
         # adding custom choices in order to let the free-text textarea appear when selected 
-        default_choices = [("", "---------"), *choices_as_tuple, ("freetext", "free")]
+        default_choices = [("", "---------"), *choices_as_tuple, ("freetext", "Free text")]
 
-        self.fields["use_contraints"].choices = default_choices
+        self.fields["use_constraints"].choices = default_choices

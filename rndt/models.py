@@ -111,3 +111,6 @@ class LayerRNDT(models.Model):
     class Meta:
         ordering = ("layer", "constraints_other")
         verbose_name_plural = "Layer RNDT"
+
+    def is_changed(self, new_value):
+        return self.constraints_other == new_value

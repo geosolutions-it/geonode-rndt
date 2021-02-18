@@ -67,12 +67,12 @@
                     <div class="panel-heading">{% trans "Data Contraints" %}</div>
                         <div class="panel-body">
                             <div>
-                                <span><label for="{{ LayerRNDTForm.limitation_public_access }}">{% trans "Access constraints" %}</label></span>
+                                <span><label>{% trans "Access constraints" %}</label></span>
                                 {{ LayerRNDTForm.access_contraints }}
                             </div>
                             <div>
                                 <span><label>{% trans "Use constraints" %}</label></span>
-                                {{ LayerRNDTForm.use_contraints }}
+                                {{ LayerRNDTForm.use_constraints }}
                             </div>
                             <div id="free_text" hidden>
                                 <span><label>{% trans "Free text" %}</label></span>
@@ -80,7 +80,7 @@
                             </div>
                             <script type="text/javascript">
                                 $(document).ready(function() {
-                                    $("select[name$='use_contraints']").click(function() {
+                                    $("select[name$='use_constraints']").click(function() {
                                         var x = $(this).val();
                                         if ($(this).val() == 'freetext') {
                                             $("#free_text").show();
