@@ -20,14 +20,15 @@ def layer_metadata(
     ajax=True,
     *args,
     **kwargs,
-):
+): 
+    layer = _resolve_layer(
+        request,
+        layername,
+        "base.change_resourcebase_metadata",
+        _PERMISSION_MSG_METADATA,
+    )
+
     if request.method == "POST":
-        layer = _resolve_layer(
-            request,
-            layername,
-            "base.change_resourcebase_metadata",
-            _PERMISSION_MSG_METADATA,
-        )
         constraint_form = LayerRNDTForm(request.POST)
         if not constraint_form.is_valid():
             logger.error(
@@ -46,26 +47,28 @@ def layer_metadata(
 
         #  get cleaned form values
         items = constraint_form.cleaned_data
-        #  create the constraints_other required for RNDT
-        constraints_other = f"{items['access_contraints'].keyword.about}+{items['access_contraints'].label}"
-        #  get the layer available or create it
-        available = LayerRNDT.objects.get(layer=layer)
-        #  if the object does not exists, will save it for the first time
-        if available is None:
-            available = LayerRNDT(
-                layer=layer,
-                constraints_other=constraints_other
-            )
-             #  save the new value in the DB
-            available.save()
-        else:
-            #  if the object exists and the constraing_other is changed
-            #  the value will be updated
-            if available.is_changed(constraints_other):
-                available.constraints_other = constraints_other
+        if items['access_contraints']:
+            #  create the constraints_other required for RNDT
+            constraints_other = f"{items['access_contraints'].keyword.about}+{items['access_contraints'].label}"
+            #  get the layer available or create it
+            available = LayerRNDT.objects.filter(layer=layer)
+            #  if the object does not exists, will save it for the first time
+            if not available.exists():
+                available = LayerRNDT(
+                    layer=layer,
+                    constraints_other=constraints_other
+                )
                 #  save the new value in the DB
                 available.save()
-
+            else:
+                #  if the object exists and the constraing_other is changed
+                #  the value will be updated
+                available = available.first()
+                if available.is_changed(constraints_other):
+                    available.constraints_other = constraints_other
+                    #  save the new value in the DB
+                    available.save()
+    
         #  get the value to be saved in constraints_other
         layer_constraint = (
             items["free_text"]
