@@ -101,6 +101,7 @@ signals.post_save.connect(resourcebase_post_save, sender=ResourceBase)
 class LayerRNDT(models.Model):
     layer = models.OneToOneField(Layer, on_delete=models.CASCADE)
     constraints_other = models.TextField(default=None, null=True)
+    resolution = models.FloatField(default=None, null=True)
 
     def __str__(self):
         return f"{self.layer.title}: {self.constraints_other}"

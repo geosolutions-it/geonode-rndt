@@ -17,6 +17,7 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('constraints_other', models.TextField(default=None, null=True)),
                 ('layer', models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, to='layers.Layer')),
+                ('resolution', models.FloatField(default=None, null=False))
             ],
             options={
                 'verbose_name_plural': 'Layer RNDT',
