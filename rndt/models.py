@@ -2,7 +2,7 @@ from django.db import models
 from django.db.models import signals
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from geonode.base.models import resourcebase_post_save
+from geonode.base.models import Link, resourcebase_post_save
 from geonode.groups.models import GroupProfile
 from geonode.layers.models import Layer, ResourceBase
 
@@ -92,6 +92,8 @@ def _group_post_save(sender, instance, raw, **kwargs):
             resource.save()
 
         r_updated = ",".join([str(r.id) for r in resources])
+        l = Link.objects.filter(link_type='metadata').filter(resource__id=resource.id)
+        l.delete()
         print(f"Following resources id has been updated : {r_updated}")
     # updating Links
 
