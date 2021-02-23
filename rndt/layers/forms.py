@@ -1,6 +1,7 @@
 from django import forms
 from django.conf import settings
 from django.forms import models
+from django.forms.widgets import NumberInput
 from django.utils.translation import ugettext_lazy as _
 from geonode.base.models import ThesaurusKeywordLabel
 
@@ -29,8 +30,14 @@ class LayerRNDTForm(forms.Form):
 
     free_text = forms.CharField(
         label=_("ConditionsApplyingToAccessAndUse free text"),
-        widget=forms.Textarea,
+        widget=forms.Textarea(attrs={"class": "form-control"}),
         required=False,
+    )
+
+    resolution = forms.FloatField(
+        label=_("resolution choices"),
+        required=False,
+        widget=NumberInput(attrs={"class": "form-control"}),
     )
 
     def __init__(self, *args, **kwargs):
@@ -46,7 +53,11 @@ class LayerRNDTForm(forms.Form):
         ).filter(lang=lang)
 
         choices_as_tuple = [(x.id, x.label) for x in choices_usability]
-        # adding custom choices in order to let the free-text textarea appear when selected 
-        default_choices = [("", "---------"), *choices_as_tuple, ("freetext", "Free text")]
+        # adding custom choices in order to let the free-text textarea appear when selected
+        default_choices = [
+            ("", "---------"),
+            *choices_as_tuple,
+            ("freetext", "Free text"),
+        ]
 
         self.fields["use_constraints"].choices = default_choices

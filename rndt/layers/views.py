@@ -20,7 +20,7 @@ def layer_metadata(
     ajax=True,
     *args,
     **kwargs,
-): 
+):
     layer = _resolve_layer(
         request,
         layername,
@@ -47,7 +47,7 @@ def layer_metadata(
 
         #  get cleaned form values
         items = constraint_form.cleaned_data
-        if items['access_contraints']:
+        if items["access_contraints"]:
             #  create the constraints_other required for RNDT
             constraints_other = f"{items['access_contraints'].keyword.about}+{items['access_contraints'].label}"
             #  get the layer available or create it
@@ -56,7 +56,8 @@ def layer_metadata(
             if not available.exists():
                 available = LayerRNDT(
                     layer=layer,
-                    constraints_other=constraints_other
+                    constraints_other=constraints_other,
+                    resolution=items["resolution"],
                 )
                 #  save the new value in the DB
                 available.save()
@@ -66,9 +67,10 @@ def layer_metadata(
                 available = available.first()
                 if available.is_changed(constraints_other):
                     available.constraints_other = constraints_other
+                    available.resolution = items["resolution"]
                     #  save the new value in the DB
                     available.save()
-    
+
         #  get the value to be saved in constraints_other
         layer_constraint = (
             items["free_text"]
@@ -78,12 +80,14 @@ def layer_metadata(
         #  cloning acutal request to make it mutable
         request.POST = request.POST.copy()
         #  oerride fields needed for rndt
-        request.POST['resource-restriction_code_type'] = '8'
+        request.POST["resource-restriction_code_type"] = "8"
         if layer_constraint.isnumeric():
             klobj = ThesaurusKeywordLabel.objects.get(id=layer_constraint)
-            request.POST['resource-constraints_other'] = f"{klobj.keyword.about}+{klobj.label}"
+            request.POST[
+                "resource-constraints_other"
+            ] = f"{klobj.keyword.about}+{klobj.label}"
         else:
-            request.POST['resource-constraints_other'] = layer_constraint
+            request.POST["resource-constraints_other"] = layer_constraint
         #  reset the request as immutable
         request.POST._mutable = False
 

@@ -131,6 +131,15 @@
                     </div>
                 </div>
             </div>
+            <div class="col-xs-12 col-lg-4">
+                <div class="panel panel-default">
+                    <div class="panel-heading">{% trans "Resolution" %}</div>
+                        <div class="panel-body">
+                            <span><label for="id_resolution" class="control-label required-field">{% trans "Resolution" %}</label></span><br>
+                            {{ LayerRNDTForm.resolution|get_resolution_value:layer.id }}
+                        </div>
+                    </div>
+            </div>
         </div>
     </div>
  {% endblock other_tab %}

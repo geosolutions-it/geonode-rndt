@@ -2,14 +2,7 @@ from django.db import models
 from django.db.models import signals
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-
-<<<<<<< HEAD
-from geonode.base.models import resourcebase_post_save
-
-=======
 from geonode.base.models import Link, resourcebase_post_save
-
->>>>>>> fe929bbc5929f056013f525a38da65fea3fef329
 from geonode.groups.models import GroupProfile
 from geonode.layers.models import Layer, ResourceBase
 
@@ -99,13 +92,14 @@ def _group_post_save(sender, instance, raw, **kwargs):
             resource.save()
 
         r_updated = ",".join([str(r.id) for r in resources])
-        l = Link.objects.filter(link_type='metadata').filter(resource__id=resource.id)
+        l = Link.objects.filter(link_type="metadata").filter(resource__id=resource.id)
         l.delete()
         print(f"Following resources id has been updated : {r_updated}")
     # updating Links
 
 
 signals.post_save.connect(resourcebase_post_save, sender=ResourceBase)
+
 
 class LayerRNDT(models.Model):
     layer = models.OneToOneField(Layer, on_delete=models.CASCADE)
@@ -126,7 +120,7 @@ class LayerRNDT(models.Model):
         return self.constraints_other == new_value
 
     def clean_constraints_other(self):
-        if '+' in self.constraints_other:
-            return self.constraints_other.split('+')[1]
+        if "+" in self.constraints_other:
+            return self.constraints_other.split("+")[1]
         else:
             return self.constraints_other
