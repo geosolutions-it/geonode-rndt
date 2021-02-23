@@ -3,6 +3,10 @@
 {% load static %}
 {% load floppyforms %}
 
+{% block additional_scripts %}
+<script type="text/javascript" src="{% static "rndt/js/forms/rndt_form.js" %}"></script>
+{% endblock additional_scripts %}
+
 {% block layer_constraints %}
 {% if not DISABLE_LAYER_CONSTRAINTS %}
   <div class="col-lg-4">
@@ -35,7 +39,7 @@
           <a>{% trans "Dataset Attributes" %}</a>
       </li>
       <li data-step="5"  data-toggle="tab" href="#additionalcontraints">
-          <a>{% trans "Additional Contraints" %}</a>
+          <a>{% trans "Additional info" %}</a>
       </li>
   </ul>
   {% endblock breadcrumbs %}
@@ -56,11 +60,75 @@
  {% endblock edit_progress %}
 
  {% block other_tab %}
+{% load rndt_extra %}
     <div id="additionalcontraints" class="tab-pane fade">
         <div class="panel-group">
-            <div class="panel panel-default">
-                <div class="panel-body">
-                Placeholder text, all the Contraints required will be implemented with Django forms
+            <div class="col-xs-12 col-lg-8">
+                <div class="panel panel-default">
+                    <div class="panel-heading">{% trans "Data Contraints" %}</div>
+                        <div class="panel-body">
+                            <div>
+                                <!--span><label>{% trans "Access constraints" %}</label></span>
+                                {{ LayerRNDTForm.access_contraints }}-->
+                                <span><label for="id_access_contraints" class="control-label required-field">{% trans "Access constraints" %}</label></span>
+                                <select
+                                    title="{% trans "Choose one of the following..." %}"
+                                    name="access_contraints"
+                                    id="id_access_contraints"
+                                    class="selectpicker form-control"
+                                    >
+                                    {% for item in LayerRNDTForm.access_contraints.field.choices %}
+                                        {% if item.0|is_saved_one:layer.id %}
+                                        <option  selected value="{{ item.0 }}">
+                                        {% else %}
+                                        <option  value="{{ item.0 }}">
+                                        {% endif %}
+                                            {{ item.1 }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div>
+                                <span><label for="id_use_constraints" class="control-label required-field">{% trans "Use constraints" %}</label></span>
+                                <select
+                                    title="{% trans "Choose one of the following..." %}"
+                                    name="use_constraints"
+                                    id="id_use_constraints"
+                                    class="selectpicker form-control"
+                                    >                                    
+                                    {% for item in LayerRNDTForm.use_constraints.field.choices %}
+                                        {% if item.0|get_other_constraint:layer.id %}
+                                        <option  selected value="{{ item.0 }}">
+                                        {% else %}
+                                        <option value="{{ item.0 }}">
+                                        {% endif %}
+                                            {{ item.1 }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div id="free_text" hidden>
+                                <span><label>{% trans "Free text" %}</label></span>
+                                {{ LayerRNDTForm.free_text }}
+                            </div>
+                            <script type="text/javascript">
+                                $(document).ready(function() {
+                                    $("select[name$='use_constraints']").click(function() {
+                                        if ($(this).val() == 'freetext') {
+                                            $("#free_text").show();
+                                        } else {
+                                            $("#free_text").hide();
+                                        }
+                                    });
+                                    var x = $("#id_use_constraints");
+                                    if ((x.val() == 'freetext' || x.val() == '') && "{{layer.constraints_other}}") {
+                                        $("select[id$='id_use_constraints']").val("freetext");
+                                        $("textarea[id$='free_text']").val("{{layer.constraints_other}}");
+                                        $("div[id$='free_text']").show();
+                                    }
+                                });
+                            </script>
+                    </div>
                 </div>
             </div>
         </div>
