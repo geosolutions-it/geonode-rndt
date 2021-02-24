@@ -78,7 +78,7 @@
                                     class="selectpicker form-control"
                                     >
                                     {% for item in LayerRNDTForm.access_contraints.field.choices %}
-                                        {% if item.0|is_saved_one:layer.id %}
+                                        {% if item.0|get_access_contraints:layer.id %}
                                         <option  selected value="{{ item.0 }}">
                                         {% else %}
                                         <option  value="{{ item.0 }}">
