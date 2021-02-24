@@ -4,9 +4,16 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from geonode.base.models import Link, resourcebase_post_save
 from geonode.groups.models import GroupProfile
+
+<<<<<<< HEAD
+from geonode.layers.models import Layer
+
+=======
 from geonode.layers.models import Layer, ResourceBase
 
 from rndt.uuidhandler import UUIDHandler
+
+>>>>>>> 77e8ef80e1e85d9ad40521bc8d168e0729491bc8
 
 
 class PubblicaAmministrazione(models.Model):
