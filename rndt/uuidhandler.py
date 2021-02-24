@@ -1,6 +1,8 @@
 import logging
-import uuid
 import re
+import uuid
+
+from geonode.base.models import Link
 
 
 class UUIDHandler:
@@ -30,7 +32,7 @@ class UUIDHandler:
                 )
         else:
             newuuid = f"{layer_ipa}:{self.instance.uuid}"
-
+        self.delete_old_metadata_links()
         return newuuid[:36]
 
     def get_layer_ipa(self):
@@ -64,3 +66,7 @@ class UUIDHandler:
         pattern = re.compile(":\W*(\w+)\W*$")
         match = re.findall(pattern, instance_uuid)
         return match[0] if match else False
+
+    def delete_old_metadata_links(self):
+        l = Link.objects.filter(link_type='metadata').filter(resource__id=self.instance.id)
+        l.delete()

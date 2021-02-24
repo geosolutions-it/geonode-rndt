@@ -2,7 +2,7 @@ from django.db import models
 from django.db.models import signals
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from geonode.base.models import resourcebase_post_save
+from geonode.base.models import Link, resourcebase_post_save
 from geonode.groups.models import GroupProfile
 from geonode.layers.models import Layer, ResourceBase
 
