@@ -1,5 +1,3 @@
-from django.http.response import HttpResponse
-
 from tastypie.constants import ALL
 from tastypie.resources import ModelResource
 

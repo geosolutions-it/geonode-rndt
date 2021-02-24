@@ -2,8 +2,7 @@ from django.db import models
 from django.db.models import signals
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-
-from geonode.base.models import resourcebase_post_save
+from geonode.base.models import Link, resourcebase_post_save
 from geonode.groups.models import GroupProfile
 from geonode.layers.models import Layer, ResourceBase
 
@@ -80,21 +79,6 @@ class GroupProfileRNDT(models.Model):
         verbose_name_plural = "Group Profile RNDT"
 
 
-class LayerRNDT(models.Model):
-    layer = models.OneToOneField(Layer, on_delete=models.CASCADE)
-    constraints_other = models.TextField(default=None, null=True)
-
-    def __str__(self):
-        return f"{self.layer.title}: {self.constraints_other}"
-
-    def as_dict(self):
-        return {"layer": self.layer.id, "constraints_other": self.constraints_other}
-
-    class Meta:
-        ordering = ("layer", "constraints_other")
-        verbose_name_plural = "Layer RNDT"
-
-
 @receiver(post_save, sender=GroupProfileRNDT)
 def _group_post_save(sender, instance, raw, **kwargs):
     # if the pa is changed, all the connected resources will be updated
@@ -127,3 +111,26 @@ def replace_uuid(resources, current_ipa, ipa_to_replace):
     return r_updated
 
 signals.post_save.connect(resourcebase_post_save, sender=ResourceBase)
+
+class LayerRNDT(models.Model):
+    layer = models.OneToOneField(Layer, on_delete=models.CASCADE)
+    constraints_other = models.TextField(default=None, null=True)
+
+    def __str__(self):
+        return f"{self.layer.title}: {self.constraints_other}"
+
+    def as_dict(self):
+        return {"layer": self.layer.id, "constraints_other": self.constraints_other}
+
+    class Meta:
+        ordering = ("layer", "constraints_other")
+        verbose_name_plural = "Layer RNDT"
+
+    def is_changed(self, new_value):
+        return self.constraints_other == new_value
+
+    def clean_constraints_other(self):
+        if '+' in self.constraints_other:
+            return self.constraints_other.split('+')[1]
+        else:
+            return self.constraints_other
