@@ -7,5 +7,5 @@ api.register(PubblicaAmministrazioneResource())
 pubblica_amministrazione = PubblicaAmministrazioneResource()
 
 urlpatterns = [
-    url(r'^(?P<api_name>api)/', include(pubblica_amministrazione.urls), name="pubblica_amministrazione")
+    url(r'^(?P<api_name>api)/', include(pubblica_amministrazione.urls), name="pubblica_amministrazione"),
 ]
