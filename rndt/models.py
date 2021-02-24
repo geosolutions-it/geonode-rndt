@@ -111,3 +111,27 @@ def replace_uuid(resources, current_ipa, ipa_to_replace):
     return r_updated
 
 signals.post_save.connect(resourcebase_post_save, sender=ResourceBase)
+
+class LayerRNDT(models.Model):
+    layer = models.OneToOneField(Layer, on_delete=models.CASCADE)
+    constraints_other = models.TextField(default=None, null=True)
+    resolution = models.FloatField(default=None, null=True)
+
+    def __str__(self):
+        return f"{self.layer.title}: {self.constraints_other}"
+
+    def as_dict(self):
+        return {"layer": self.layer.id, "constraints_other": self.constraints_other}
+
+    class Meta:
+        ordering = ("layer", "constraints_other")
+        verbose_name_plural = "Layer RNDT"
+
+    def is_equal(self, new_value):
+        return self.constraints_other == new_value
+
+    def clean_constraints_other(self):
+        if "+" in self.constraints_other:
+            return self.constraints_other.split("+")[1]
+        else:
+            return self.constraints_other

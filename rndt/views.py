@@ -22,3 +22,13 @@ class PubblicaAmministrazioneResource(ModelResource):
             'ipa': ALL,
             'name': ALL
         }
+
+
+
+import pathlib
+
+from django.conf import settings
+
+path = pathlib.Path(__file__).parent.absolute()
+
+settings.CATALOG_METADATA_TEMPLATE = f'{path}/templates/template-rndt.xml'
