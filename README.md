@@ -8,65 +8,82 @@ Detailed information on the definition of RNDT are available at this [link](http
 
 -----
 
-Quick start
------------
-1. Install the application as requirement
-```
-pip install -e git+https://github.com/geosolutions-it/geonode-rndt@master#egg=rndt
-```
+## Configuration
 
-2. Add "rndt" to your INSTALLED_APPS setting like this::
+1. Install the application as requirement:
 
-    INSTALLED_APPS = [
-        'rndt',
-        ...
-    ]
+       pip install -e git+https://github.com/geosolutions-it/geonode-rndt@master#egg=rndt
 
-NOTE: be sure to put it as first app
+1. Add "rndt" to your INSTALLED_APPS setting like this::
 
-3.  in `geonode.settings.py` set `DIR` for `TEMPLATES` as `[]` in order to let the app overrides the templates
+       INSTALLED_APPS = [
+          'rndt',
+          ...
+       ]
 
-4.  in order to let the app overrides some static files move the `AppDirectoriesFinder` as first choice in `geonode.settings.py` in `STATICFILES_FINDERS` settings. The output should be something like this:
-```
-STATICFILES_FINDERS = (
-    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
-    'django.contrib.staticfiles.finders.FileSystemFinder'
-)
+   **NOTE**: make sure to put '`rndt`' as the first app (or anyway before '`geonode`')
+   
+   If you have a `local_setting` file, you may want to add the `rndt` app with these lines:
+   
+       geonode_index = INSTALLED_APPS.index('geonode')
+       INSTALLED_APPS = INSTALLED_APPS[:geonode_index]+('rndt',)+INSTALLED_APPS[geonode_index:]
 
-```
-5. enable RNDT context processors in `geonode.settings.py` by adding the following line in `TEMPLATES`:
-```
-'OPTIONS': {
-    'context_processors': [
-        .........
-        'rndt.context_processors.rndt_tags'
-    ],
-}
-```
+1. In `geonode.settings.py` set `DIR` for `TEMPLATES` as `[]` in order to let the app overrides the templates.  
+ 
+   If you have a `local_setting` file, you may want to do it with this line:
+   
+       TEMPLATES[0]['DIRS'] = []
 
-6. Run ``python manage.py migrate`` to create the RNDT models.
+1. In order to let the app overrides some static files, move the `AppDirectoriesFinder` as the first item
+   in `geonode.settings.py` in `STATICFILES_FINDERS` settings.  
+   The output should be something like this:
 
-To uninstall the app, remove all the `rndt` functionalities (`installed_apps` and `context_processors`) from  `geonode.settings.py` and restart the server. If needed made an hard refresh to let the browser reload the js/css/html files (windows: CTRL+ SHIFT+R | Mac: CMD+SHIFT+R)
+       STATICFILES_FINDERS = (
+          'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+          'django.contrib.staticfiles.finders.FileSystemFinder'
+       )
 
-7. Run Tests (NOTE: must be in geonode venv) ``python -m unittest -v`` to create the RNDT models.
+1. Enable RNDT context processors in `geonode.settings.py` by adding the following line in `TEMPLATES`:
 
-8. To enable the UUIDHandler, add the following line in the `geonode.settings.py` file
+       'OPTIONS': {
+          'context_processors': [
+              ...
+              'rndt.context_processors.rndt_tags'
+          ],
+       }
 
-```
-LAYER_UUID_HANDLER = "rndt.uuidhandler.UUIDHandler"
-```
+   If you have a `local_setting` file, you may want to do it with this line:
 
-9. To customize the metadata document to be RNDT compliant, use the rndt template:  
-```
-CATALOG_METADATA_TEMPLATE = 'xml/template-rndt.xml'
-```
+       TEMPLATES[0]['OPTIONS']['context_processors'].append('rndt.context_processors.rndt_tags')
 
-Configs
---
----------
+
+1. Run ``python manage.py migrate`` to create the RNDT models.
+
+1. To enable the `UUIDHandler`, add the following line in the `geonode.settings.py` file:
+
+       LAYER_UUID_HANDLER = "rndt.uuidhandler.UUIDHandler"
+
+1. To customize the metadata document to be RNDT compliant, use the rndt template:  
+
+       CATALOG_METADATA_TEMPLATE = 'xml/template-rndt.xml'
+
+
+
+
+## Tests
+
+In order to run tests (NOTE: must be in geonode venv), run ``python -m unittest -v`` to create the RNDT models.
+
+## Uninstalling
+
+To uninstall the app, remove all the `rndt` functionalities (`INSTALLED_APPS` and `context_processors`) from  `geonode.settings.py` and restart the server. 
+If needed made an hard refresh to let the browser reload the js/css/html files (windows: CTRL+ SHIFT+R | Mac: CMD+SHIFT+R)
+
+
+## Other config
 
 Some custom environment variables are avaiable:
 
-DISABLE_LAYER_CONSTRAINTS (default `true`)
+- `DISABLE_LAYER_CONSTRAINTS` (default `true`)  
 
-If `true` will hide from the Layers Metadata edit wizard page, the contraints in the tab `Location and Licenses`
+  If `true` will hide from the Layers Metadata edit wizard page, the contraints in the tab `Location and Licenses`
