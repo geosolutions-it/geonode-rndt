@@ -19,17 +19,31 @@ pip install -e git+https://github.com/geosolutions-it/geonode-rndt@master#egg=rn
 2. Add "rndt" to your INSTALLED_APPS setting like this::
 
     INSTALLED_APPS = [
-        ...
         'rndt',
+        ...
     ]
 
-3. Run ``python manage.py migrate`` to create the RNDT models.
+NOTE: be sure to put it as first app
 
+3.  in `geonode.settings.py` set `DIR` for `TEMPLATES` as `[]` in order to let the app overrides the templates
 
-4. Run Tests (NOTE: must be in geonode venv) ``python -m unittest -v`` to create the RNDT models.
+4.  in order to let the app overrides some static files move the `AppDirectoriesFinder` as first choice in `geonode.settings.py` in `STATICFILES_FINDERS` settings. The output should be something like this:
+```
+STATICFILES_FINDERS = (
+    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+    'django.contrib.staticfiles.finders.FileSystemFinder'
+)
 
-5. To enable the UUIDHandler, add the following line in the `geonode.settings.py` file
+```
+
+5. Run ``python manage.py migrate`` to create the RNDT models.
+
+6. Run Tests (NOTE: must be in geonode venv) ``python -m unittest -v``
+
+7. To enable the UUIDHandler, add the following line in the `geonode.settings.py` file
 
 ```
 LAYER_UUID_HANDLER = "rndt.uuidhandler.UUIDHandler"
 ```
+
+To uninstall the app remove `rndt` from  `geonode.settings.py`, restart the server. If needed made an hard refresh to let the browser reload the js/css/html files (windows: CTRL+ SHIFT+R | Mac: CMD+SHIFT+R)
