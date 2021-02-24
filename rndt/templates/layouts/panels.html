@@ -1,5 +1,9 @@
 {% extends "layouts/panels.html" %}
+
+{% load i18n %}
+{% load static %}
 {% load floppyforms %}
+
 {% block layer_constraints %}
 {% if not DISABLE_LAYER_CONSTRAINTS %}
   <div class="col-lg-4">
@@ -16,3 +20,52 @@
   </div>
 {% endif %}
 {% endblock layer_constraints %}
+
+{% block breadcrumbs %}
+  <ul class="wizard--progress wizard--progress--medium">
+      <li data-step="1" id="first" class="is-active" data-toggle="tab" href="#mandatory">
+          <a>{% trans "Basic Metadata" %}</a>
+      </li>
+      <li data-step="2" id="second"  data-toggle="tab" href="#advanced">
+          <a>{% trans "Location and Licenses" %}</a>
+      </li>
+      <li data-step="3" data-toggle="tab" href="#ownership">
+          <a>{% trans "Optional Metadata" %}</a>
+      </li>
+      <li data-step="4"  data-toggle="tab" href="#dataset">
+          <a>{% trans "Dataset Attributes" %}</a>
+      </li>
+      <li data-step="5"  data-toggle="tab" href="#additionalcontraints">
+          <a>{% trans "Additional Contraints" %}</a>
+      </li>
+  </ul>
+  {% endblock breadcrumbs %}
+
+
+ {% block edit_progress %}
+   <div id="completeness-hints" class="progress">
+    <div class="mandatory-hint progress-bar" role="progressbar" style="width:20%">
+      {% trans "Mandatory" %}
+    </div>
+    <div class="advanced-hint progress-bar" role="progressbar" style="width:20%">
+      {% trans "Mandatory" %}
+    </div>
+    <div class="progress-bar" role="progressbar" style="width:60%">
+      {% trans "Optional" %}
+    </div>
+  </div>
+ {% endblock edit_progress %}
+
+ {% block other_tab %}
+    <div id="additionalcontraints" class="tab-pane fade">
+        <div class="panel-group">
+            <div class="panel panel-default">
+                <div class="panel-body">
+                Placeholder text, all the Contraints required will be implemented with Django forms
+                </div>
+            </div>
+        </div>
+    </div>
+ {% endblock other_tab %}
+
+

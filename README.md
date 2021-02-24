@@ -32,8 +32,8 @@ STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
     'django.contrib.staticfiles.finders.FileSystemFinder'
 )
-
 ```
+
 5. enable RNDT context processors in `geonode.settings.py` by adding the following line in `TEMPLATES`:
 ```
 'OPTIONS': {
@@ -55,12 +55,11 @@ LAYER_UUID_HANDLER = "rndt.uuidhandler.UUIDHandler"
 
 ```
 
-To uninstall the app, remove all the `rndt` functionalities (`installed_apps` and `context_processors`) from  `geonode.settings.py` and restart the server. If needed made an hard refresh to let the browser reload the js/css/html files (windows: CTRL+ SHIFT+R | Mac: CMD+SHIFT+R)
-
+To uninstall the app, remove all the `rndt` functionalities (`installed_apps` and `context_processors`) from  `geonode.settings.py` and restart the server. 
+If needed made an hard refresh to let the browser reload the js/css/html files (windows: CTRL+ SHIFT+R | Mac: CMD+SHIFT+R)
 
 Configs
 --
----------
 
 Some custom environment variables are avaiable:
 

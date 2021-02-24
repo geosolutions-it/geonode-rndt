@@ -14,4 +14,5 @@ def run_setup_hooks(*args, **kwargs):
 
     urlpatterns += [
         url(r'^', include('rndt.api.urls')),
+        url(r'^layers/', include('rndt.layers.urls')),
     ]
