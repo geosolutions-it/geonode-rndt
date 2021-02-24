@@ -56,6 +56,11 @@ To uninstall the app, remove all the `rndt` functionalities (`installed_apps` an
 LAYER_UUID_HANDLER = "rndt.uuidhandler.UUIDHandler"
 ```
 
+9. To customize the metadata document to be RNDT compliant, use the rndt template:  
+```
+CATALOG_METADATA_TEMPLATE = 'xml/template-rndt.xml'
+```
+
 Configs
 --
 ---------
