@@ -25,3 +25,11 @@ pip install -e git+https://github.com/geosolutions-it/geonode-rndt@master#egg=rn
 
 3. Run ``python manage.py migrate`` to create the RNDT models.
 
+
+4. Run Tests (NOTE: must be in geonode venv) ``python -m unittest -v`` to create the RNDT models.
+
+5. To enable the UUIDHandler, add the following line in the `geonode.settings.py` file
+
+```
+LAYER_UUID_HANDLER = "rndt.uuidhandler.UUIDHandler"
+```
