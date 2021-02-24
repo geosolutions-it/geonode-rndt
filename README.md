@@ -2,6 +2,9 @@
 
 Geonode-RNDT is a Django App to let GeoNode be able to expose the metadata compliant to the RNDT standard
 
+![image](https://user-images.githubusercontent.com/717359/107668977-91f8ee00-6c91-11eb-8006-80e988dddeef.png)
+
+
 Detailed information on the definition of RNDT are available at this [link](https://geodati.gov.it/geoportale/)
 
 -----
@@ -34,5 +37,13 @@ STATICFILES_FINDERS = (
 ```
 
 5. Run ``python manage.py migrate`` to create the RNDT models.
+
+6. Run Tests (NOTE: must be in geonode venv) ``python -m unittest -v``
+
+7. To enable the UUIDHandler, add the following line in the `geonode.settings.py` file
+
+```
+LAYER_UUID_HANDLER = "rndt.uuidhandler.UUIDHandler"
+```
 
 To uninstall the app remove `rndt` from  `geonode.settings.py`, restart the server. If needed made an hard refresh to let the browser reload the js/css/html files (windows: CTRL+ SHIFT+R | Mac: CMD+SHIFT+R)
