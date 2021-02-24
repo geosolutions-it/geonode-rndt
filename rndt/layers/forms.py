@@ -2,26 +2,18 @@ from django import forms
 from django.conf import settings
 from django.forms import models
 from django.forms.widgets import NumberInput
+from django.utils.translation import get_language
 from django.utils.translation import ugettext_lazy as _
-from geonode.base.models import ThesaurusKeywordLabel
+from geonode.base.models import ThesaurusKeyword, ThesaurusKeywordLabel
 
 
 class LayerRNDTForm(forms.Form):
     class Meta:
-        fields = ["access_contraints", "use_constraints", "free_text"]
+        fields = ["access_contraints", "use_constraints", "free_text", "resolution"]
 
-    lang = (
-        "en"
-        if not hasattr(settings, "THESAURUS_DEFAULT_LANG")
-        else settings.THESAURUS_DEFAULT_LANG
-    )
-
-    access_contraints = models.ModelChoiceField(
+    access_contraints = forms.ChoiceField(
         label=_("LimitationsOnPublicAccess"),
-        required=False,
-        queryset=ThesaurusKeywordLabel.objects.filter(
-            keyword__thesaurus__identifier="LimitationsOnPublicAccess"
-        ).filter(lang=lang),
+        required=False
     )
 
     use_constraints = forms.ChoiceField(
@@ -42,22 +34,33 @@ class LayerRNDTForm(forms.Form):
 
     def __init__(self, *args, **kwargs):
         super(LayerRNDTForm, self).__init__(*args, *kwargs)
-        lang = (
-            "en"
-            if not hasattr(settings, "THESAURUS_DEFAULT_LANG")
-            else settings.THESAURUS_DEFAULT_LANG
-        )
-        # getting the default choices from the thesaurus
-        choices_usability = ThesaurusKeywordLabel.objects.filter(
-            keyword__thesaurus__identifier="ConditionsApplyingToAccessAndUse"
-        ).filter(lang=lang)
+        lang = get_language()
 
-        choices_as_tuple = [(x.id, x.label) for x in choices_usability]
+        # getting the default choices from the thesaurus
+        choices_usability = self._get_thesauro_keyword_label('ConditionsApplyingToAccessAndUse', lang)
+        choices_contraints = self._get_thesauro_keyword_label('LimitationsOnPublicAccess', lang)
         # adding custom choices in order to let the free-text textarea appear when selected
         default_choices = [
             ("", "---------"),
-            *choices_as_tuple,
+            *choices_usability,
             ("freetext", "Free text"),
         ]
 
         self.fields["use_constraints"].choices = default_choices
+        self.fields["access_contraints"].choices = [
+            ("", "---------"), 
+            *choices_contraints
+        ]
+
+    @staticmethod
+    def _get_thesauro_keyword_label(identifier, lang):
+        qs_local = []
+        qs_non_local = []
+        for key in ThesaurusKeyword.objects.filter(thesaurus__identifier=identifier):
+            label = ThesaurusKeywordLabel.objects.filter(keyword=key).filter(lang=lang)
+            if label.exists():
+                qs_local.append((label.get().keyword.id, label.get().label))
+            else:
+                qs_non_local.append((key.id, key.alt_label))
+
+        return qs_non_local + qs_local

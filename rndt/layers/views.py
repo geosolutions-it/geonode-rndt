@@ -2,7 +2,7 @@ import json
 import re
 
 from django.http import HttpResponse
-from geonode.base.models import ThesaurusKeywordLabel
+from geonode.base.models import ThesaurusKeyword, ThesaurusKeywordLabel
 from geonode.layers.views import (_PERMISSION_MSG_METADATA, _resolve_layer,
                                   check_keyword_write_perms)
 from geonode.layers.views import layer_metadata as geonode_layer_view
@@ -49,14 +49,14 @@ def layer_metadata(
         items = constraint_form.cleaned_data
         if items["access_contraints"]:
             #  create the constraints_other required for RNDT
-            constraints_other = f"{items['access_contraints'].keyword.about}+{items['access_contraints'].label}"
+            keyword = ThesaurusKeyword.objects.get(id=items['access_contraints'])
             #  get the layer available or create it
             available = LayerRNDT.objects.filter(layer=layer)
             #  if the object does not exists, will save it for the first time
             if not available.exists():
                 available = LayerRNDT(
                     layer=layer,
-                    constraints_other=constraints_other,
+                    constraints_other=keyword.about,
                     resolution=items["resolution"],
                 )
                 #  save the new value in the DB
@@ -65,8 +65,8 @@ def layer_metadata(
                 #  if the object exists and the constraing_other is changed
                 #  the value will be updated
                 available = available.first()
-                if available.is_changed(constraints_other):
-                    available.constraints_other = constraints_other
+                if not available.is_equal(keyword.about):
+                    available.constraints_other = keyword.about
                     available.resolution = items["resolution"]
                     #  save the new value in the DB
                     available.save()
@@ -82,10 +82,10 @@ def layer_metadata(
         #  oerride fields needed for rndt
         request.POST["resource-restriction_code_type"] = "8"
         if layer_constraint.isnumeric():
-            klobj = ThesaurusKeywordLabel.objects.get(id=layer_constraint)
+            keyword = ThesaurusKeyword.objects.get(id=layer_constraint)
             request.POST[
                 "resource-constraints_other"
-            ] = f"{klobj.keyword.about}+{klobj.label}"
+            ] = keyword.about
         else:
             request.POST["resource-constraints_other"] = layer_constraint
         #  reset the request as immutable

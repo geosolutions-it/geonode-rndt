@@ -29,7 +29,7 @@ class PubblicaAmministrazione(models.Model):
         # check if the ipa code is changed
         self.ipa_has_changed = self._has_changed()
         if self.ipa_has_changed:
-            self.rb_to_update = (self.ipa, self.__previous_ipa)
+            self.rb_to_update = (self.ipa,  self.__previous_ipa if self.__previous_ipa else None)
         super(PubblicaAmministrazione, self).save(*args, **kwargs)
 
     def _has_changed(self):
@@ -65,7 +65,7 @@ class GroupProfileRNDT(models.Model):
         # check if the ipa code is changed
         self.ipa_has_changed = self._has_changed()
         if self.ipa_has_changed:
-            self.rb_to_update = (self.pa.ipa, self.__previous_pa.ipa)
+            self.rb_to_update = (self.pa.ipa, self.__previous_pa.ipa if self.__previous_pa else None)
         super(GroupProfileRNDT, self).save(*args, **kwargs)
 
     def _has_changed(self):
@@ -116,7 +116,7 @@ class LayerRNDT(models.Model):
         ordering = ("layer", "constraints_other")
         verbose_name_plural = "Layer RNDT"
 
-    def is_changed(self, new_value):
+    def is_equal(self, new_value):
         return self.constraints_other == new_value
 
     def clean_constraints_other(self):
