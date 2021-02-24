@@ -28,8 +28,9 @@ class PubblicaAmministrazione(models.Model):
     def save(self, *args, **kwargs):
         # check if the ipa code is changed
         self.ipa_has_changed = self._has_changed()
+        self._rb_to_update = (None, None)
         if self.ipa_has_changed:
-            self.rb_to_update = (self.ipa,  self.__previous_ipa if self.__previous_ipa else None)
+            self._rb_to_update = (self.ipa,  self.__previous_ipa if self.__previous_ipa else None)
         super(PubblicaAmministrazione, self).save(*args, **kwargs)
 
     def _has_changed(self):
@@ -64,8 +65,9 @@ class GroupProfileRNDT(models.Model):
     def save(self, *args, **kwargs):
         # check if the ipa code is changed
         self.ipa_has_changed = self._has_changed()
+        self._rb_to_update = (None, None)
         if self.ipa_has_changed:
-            self.rb_to_update = (self.pa.ipa, self.__previous_pa.ipa if self.__previous_pa else None)
+            self._rb_to_update = (self.pa.ipa, self.__previous_pa.ipa if self.__previous_pa else None)
         super(GroupProfileRNDT, self).save(*args, **kwargs)
 
     def _has_changed(self):
@@ -78,28 +80,37 @@ class GroupProfileRNDT(models.Model):
 
 
 @receiver(post_save, sender=GroupProfileRNDT)
-@receiver(post_save, sender=PubblicaAmministrazione)
 def _group_post_save(sender, instance, raw, **kwargs):
     # if the pa is changed, all the connected resources will be updated
     # the Ipas are object in this case
-    current_ipa, ipa_to_replace = instance.rb_to_update
+    current_ipa, ipa_to_replace = instance._rb_to_update
     if instance.ipa_has_changed and ipa_to_replace:
-        resources = Layer.objects.filter(uuid__startswith=ipa_to_replace)
-        for resource in resources:
-            resource.uuid = UUIDHandler.replace_uuid(
-                current_ipa, ipa_to_replace, resource.uuid
-            )
-            resource.save()
-
-        r_updated = ",".join([str(r.id) for r in resources])
-        l = Link.objects.filter(link_type="metadata").filter(resource__id=resource.id)
-        l.delete()
-        print(f"Following resources id has been updated : {r_updated}")
+        resources = Layer.objects.filter(group_id=instance.group_profile.group_id)
+        replace_uuid(resources, current_ipa, ipa_to_replace)
     # updating Links
 
+@receiver(post_save, sender=PubblicaAmministrazione)
+def _pa_post_save(sender, instance, raw, **kwargs):
+    # if the pa is changed, all the connected resources will be updated
+    # the Ipas are object in this case
+    current_ipa, ipa_to_replace = instance._rb_to_update
+    if instance.ipa_has_changed and ipa_to_replace:
+        resources = Layer.objects.filter(uuid__startswith=ipa_to_replace)
+        replace_uuid(resources, current_ipa, ipa_to_replace)
+    # updating Links
+
+def replace_uuid(resources, current_ipa, ipa_to_replace):
+    for resource in resources:
+        resource.uuid = UUIDHandler.replace_uuid(
+            current_ipa, ipa_to_replace, resource.uuid
+        )
+        resource.save()
+
+    r_updated = ",".join([str(r.id) for r in resources])
+    print(f"Following resources id has been updated : {r_updated}")
+    return r_updated
 
 signals.post_save.connect(resourcebase_post_save, sender=ResourceBase)
-
 
 class LayerRNDT(models.Model):
     layer = models.OneToOneField(Layer, on_delete=models.CASCADE)
