@@ -46,6 +46,15 @@ STATICFILES_FINDERS = (
 
 6. Run ``python manage.py migrate`` to create the RNDT models.
 
+7. Run Tests (NOTE: must be in geonode venv) ``python -m unittest -v``
+
+8. To enable the UUIDHandler, add the following line in the `geonode.settings.py` file
+
+```
+LAYER_UUID_HANDLER = "rndt.uuidhandler.UUIDHandler"
+
+```
+
 To uninstall the app, remove all the `rndt` functionalities (`installed_apps` and `context_processors`) from  `geonode.settings.py` and restart the server. If needed made an hard refresh to let the browser reload the js/css/html files (windows: CTRL+ SHIFT+R | Mac: CMD+SHIFT+R)
 
 
