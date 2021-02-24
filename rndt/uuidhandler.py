@@ -27,9 +27,7 @@ class UUIDHandler:
             if layer_ipa == uuid_ipa:
                 newuuid = self.instance.uuid
             else:
-                newuuid = self.replace_uuid(
-                    layer_ipa, uuid_ipa, self.instance.uuid
-                )
+                newuuid = self.replace_uuid(layer_ipa, uuid_ipa, self.instance.uuid)
         else:
             newuuid = f"{layer_ipa}:{self.instance.uuid}"
         self.delete_old_metadata_links()
@@ -68,5 +66,7 @@ class UUIDHandler:
         return match[0] if match else False
 
     def delete_old_metadata_links(self):
-        l = Link.objects.filter(link_type='metadata').filter(resource__id=self.instance.id)
+        l = Link.objects.filter(link_type="metadata").filter(
+            resource__id=self.instance.id
+        )
         l.delete()

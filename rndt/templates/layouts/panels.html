@@ -3,6 +3,10 @@
 {% load static %}
 {% load floppyforms %}
 
+{% block additional_scripts %}
+<script type="text/javascript" src="{% static "rndt/js/forms/rndt_form.js" %}"></script>
+{% endblock additional_scripts %}
+
 {% block layer_constraints %}
 {% if not DISABLE_LAYER_CONSTRAINTS %}
   <div class="col-lg-4">
@@ -61,7 +65,7 @@
         <div class="panel-group">
             <div class="col-xs-12 col-lg-8">
                 <div class="panel panel-default">
-                    <div class="panel-heading">{% trans "Data Contraints" %}</div>
+                    <div class="panel-heading">{% trans "Data Constraints" %}</div>
                         <div class="panel-body">
                             <div>
                                 <!--span><label>{% trans "Access constraints" %}</label></span>
@@ -74,7 +78,7 @@
                                     class="selectpicker form-control"
                                     >
                                     {% for item in LayerRNDTForm.access_contraints.field.choices %}
-                                        {% if item.0|is_saved_one:layer.id %}
+                                        {% if item.0|get_access_contraints:layer.id %}
                                         <option  selected value="{{ item.0 }}">
                                         {% else %}
                                         <option  value="{{ item.0 }}">
@@ -127,8 +131,18 @@
                     </div>
                 </div>
             </div>
-        </div>
+            <div class="col-xs-12 col-lg-4">
+                <div class="panel panel-default">
+                    <div class="panel-heading">{% trans "Resolution" %}</div>
+                        <div class="panel-body">
+                            <span><label for="id_resolution" class="control-label required-field">{% trans "Resolution" %}</label></span><br>
+                            <div class="input-group">
+                                <div class="input-group-addon">mt</div>
+                                {{ LayerRNDTForm.resolution|get_resolution_value:layer.id }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
     </div>
  {% endblock other_tab %}
-
-

@@ -9,10 +9,10 @@ class RndtConfig(AppConfig):
         super(RndtConfig, self).ready()
 
 def run_setup_hooks(*args, **kwargs):
+    from django.conf.urls import include, url
     from geonode.urls import urlpatterns
-    from django.conf.urls import url, include
 
     urlpatterns += [
-        url(r'^', include('rndt.api.urls')),
-        url(r'^layers/', include('rndt.layers.urls')),
+        url(r"^", include("rndt.api.urls")),
+        url(r"^layers/", include("rndt.layers.urls")),
     ]

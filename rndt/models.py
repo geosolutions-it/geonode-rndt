@@ -129,11 +129,11 @@ class LayerRNDT(models.Model):
         ordering = ("layer", "constraints_other")
         verbose_name_plural = "Layer RNDT"
 
-    def is_changed(self, new_value):
+    def is_equal(self, new_value):
         return self.constraints_other == new_value
 
     def clean_constraints_other(self):
-        if '+' in self.constraints_other:
-            return self.constraints_other.split('+')[1]
+        if "+" in self.constraints_other:
+            return self.constraints_other.split("+")[1]
         else:
             return self.constraints_other
