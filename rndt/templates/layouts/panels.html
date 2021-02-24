@@ -3,10 +3,6 @@
 {% load static %}
 {% load floppyforms %}
 
-{% block additional_scripts %}
-<script type="text/javascript" src="{% static "rndt/js/forms/rndt_form.js" %}"></script>
-{% endblock additional_scripts %}
-
 {% block layer_constraints %}
 {% if not DISABLE_LAYER_CONSTRAINTS %}
   <div class="col-lg-4">
@@ -134,3 +130,5 @@
         </div>
     </div>
  {% endblock other_tab %}
+
+
