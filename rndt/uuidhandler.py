@@ -27,10 +27,19 @@ class UUIDHandler:
             if layer_ipa == uuid_ipa:
                 newuuid = self.instance.uuid
             else:
+<<<<<<< HEAD
                 newuuid = self.replace_uuid(layer_ipa, uuid_ipa, self.instance.uuid)
         else:
             newuuid = f"{layer_ipa}:{self.instance.uuid}"
         self.delete_old_metadata_links()
+=======
+                newuuid = self.replace_uuid(
+                    layer_ipa, uuid_ipa, self.instance.uuid
+                )
+        else:
+            newuuid = f"{layer_ipa}:{self.instance.uuid}"
+
+>>>>>>> 259f4621cfab7aec9765974c8cd4c6e8d5e17741
         return newuuid[:36]
 
     def get_layer_ipa(self):
@@ -64,9 +73,12 @@ class UUIDHandler:
         pattern = re.compile(":\W*(\w+)\W*$")
         match = re.findall(pattern, instance_uuid)
         return match[0] if match else False
+<<<<<<< HEAD
 
     def delete_old_metadata_links(self):
         l = Link.objects.filter(link_type="metadata").filter(
             resource__id=self.instance.id
         )
         l.delete()
+=======
+>>>>>>> 259f4621cfab7aec9765974c8cd4c6e8d5e17741
