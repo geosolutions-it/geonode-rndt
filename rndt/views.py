@@ -1,7 +1,8 @@
 from django.http.response import HttpResponse
-from tastypie.resources import ModelResource
-from rndt.models import PubblicaAmministrazione
 from tastypie.constants import ALL
+from tastypie.resources import ModelResource
+
+from rndt.models import PubblicaAmministrazione
 
 
 class PubblicaAmministrazioneResource(ModelResource):
