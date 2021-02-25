@@ -420,7 +420,6 @@
                </gmd:useConstraints>
                <gmd:otherConstraints>
                {% if layer.constraints_other|is_url %}
-                  {# TODO controllare se selezione anchor o characterstring #}
                   <gmx:Anchor xlink:href="{{layer.constraints_other}}">{{layer.constraints_other|get_use_constraint_keyword}}</gmx:Anchor>
                {% else %}
                   <gco:CharacterString>{{layer.constraints_other}}</gco:CharacterString>
