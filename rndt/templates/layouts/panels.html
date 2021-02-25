@@ -113,7 +113,7 @@
                             </div>
                             <script type="text/javascript">
                                 $(document).ready(function() {
-                                    $("select[name$='use_constraints']").click(function() {
+                                    $("select[name$='use_constraints']").change(function() {
                                         if ($(this).val() == 'freetext') {
                                             $("#free_text").show();
                                         } else {
