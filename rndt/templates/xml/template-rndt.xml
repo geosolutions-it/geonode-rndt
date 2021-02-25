@@ -1,4 +1,5 @@
 {% load thesaurus %}
+{% load metadata_tags %}
 <gmd:MD_Metadata xmlns:gmd="http://www.isotc211.org/2005/gmd"
                  xmlns:gco="http://www.isotc211.org/2005/gco"
                  xmlns:gml="http://www.opengis.net/gml/3.2"
@@ -377,7 +378,7 @@
                   <gmd:CI_Citation>
                      <gmd:title>
                         <gmx:Anchor 
-                           xlink:href="http://thesaurus.URI.about.TODO">{{thesaurus_id|get_thesaurus_title}}</gmx:Anchor>
+                           xlink:href="{{thesaurus_id|get_thesaurus_about}}">{{thesaurus_id|get_thesaurus_title}}</gmx:Anchor>
                      </gmd:title>
                      <gmd:date>
                         <gmd:CI_Date>
@@ -406,7 +407,7 @@
                      codeListValue="otherRestrictions">otherRestrictions</gmd:MD_RestrictionCode>
                </gmd:accessConstraints>
                <gmd:otherConstraints>
-                  <gmx:Anchor xlink:href="TODO">TODO</gmx:Anchor>
+                  <gmx:Anchor xlink:href="{{layer.id|get_access_contraints_url}}">{{layer.id|get_access_contraints_keyword}}</gmx:Anchor>
                </gmd:otherConstraints>
             </gmd:MD_LegalConstraints>
          </gmd:resourceConstraints>
@@ -418,8 +419,12 @@
                       codeListValue="otherRestrictions">otherRestrictions</gmd:MD_RestrictionCode>
                </gmd:useConstraints>
                <gmd:otherConstraints>
+               {% if layer.constraints_other|is_url %}
                   {# TODO controllare se selezione anchor o characterstring #}
-                  <gmx:Anchor xlink:href="http://TODO">TODO</gmx:Anchor>
+                  <gmx:Anchor xlink:href="{{layer.constraints_other}}">{{layer.constraints_other|get_use_constraint_keyword}}</gmx:Anchor>
+               {% else %}
+                  <gco:CharacterString>{{layer.constraints_other}}</gco:CharacterString>
+               {% endif %}
                </gmd:otherConstraints>
             </gmd:MD_LegalConstraints>
          </gmd:resourceConstraints>

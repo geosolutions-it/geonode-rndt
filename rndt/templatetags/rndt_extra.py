@@ -27,8 +27,6 @@ def get_other_constraint(constraint_id, layer_id):
     return keyword.about in (other_constraint or [])
 
 
-
-
 @register.filter
 def get_resolution_value(value, layer_id):
     layer = LayerRNDT.objects.filter(layer=layer_id)
