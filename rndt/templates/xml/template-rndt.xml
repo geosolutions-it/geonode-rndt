@@ -365,7 +365,7 @@
                {% if keyword.thesaurus.id == thesaurus_id %}
                <gmd:keyword>
                   <gmx:Anchor 
-                     xlink:href="{{keyword.about}}">{{keyword|get_keyword_label}}</gmx:Anchor>
+                     xlink:href="{{keyword.about}}">{{keyword.alt_label}}</gmx:Anchor>
                </gmd:keyword>
                {% endif %}
                {% endfor %}
@@ -746,8 +746,7 @@
                      </gmd:valueUnit>
                      <gmd:value>
                         <gco:Record> 
-                           {# TODO #}
-                           <gco:Real>1.0</gco:Real>
+                           <gco:Real>{{layer.id|get_positional_accuracy}}</gco:Real>
                         </gco:Record>
                      </gmd:value>
                   </gmd:DQ_QuantitativeResult>

@@ -2,7 +2,6 @@ from django.db import models
 from django.db.models import signals
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-
 from geonode.base.models import Link, resourcebase_post_save
 from geonode.groups.models import GroupProfile
 from geonode.layers.models import Layer, ResourceBase
@@ -118,6 +117,7 @@ class LayerRNDT(models.Model):
     layer = models.OneToOneField(Layer, on_delete=models.CASCADE)
     constraints_other = models.TextField(default=None, null=True)
     resolution = models.FloatField(default=None, null=True)
+    accuracy = models.FloatField(default=None, null=True)
 
     def __str__(self):
         return f"{self.layer.title}: {self.constraints_other}"

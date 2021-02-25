@@ -32,6 +32,12 @@ class LayerRNDTForm(forms.Form):
         widget=NumberInput(attrs={"class": "form-control"}),
     )
 
+    accuracy = forms.FloatField(
+        label=_("accuracy"),
+        required=False,
+        widget=NumberInput(attrs={"class": "form-control"}),
+    )
+
     def __init__(self, *args, **kwargs):
         super(LayerRNDTForm, self).__init__(*args, *kwargs)
         lang = get_language()
