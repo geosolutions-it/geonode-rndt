@@ -41,3 +41,8 @@ def is_url(item):
         return True
     except:
         return False
+
+
+@register.filter
+def get_positional_accuracy(layer_id):
+    return LayerRNDT.objects.get(layer_id=layer_id).accuracy

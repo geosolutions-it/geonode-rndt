@@ -47,29 +47,30 @@ def layer_metadata(
 
         #  get cleaned form values
         items = constraint_form.cleaned_data
-        if items["access_contraints"]:
-            #  create the constraints_other required for RNDT
-            keyword = ThesaurusKeyword.objects.get(id=items['access_contraints'])
-            #  get the layer available or create it
-            available = LayerRNDT.objects.filter(layer=layer)
-            #  if the object does not exists, will save it for the first time
-            if not available.exists():
-                available = LayerRNDT(
-                    layer=layer,
-                    constraints_other=keyword.about,
-                    resolution=items["resolution"],
-                )
-                #  save the new value in the DB
-                available.save()
-            else:
-                #  if the object exists and the constraing_other is changed
-                #  the value will be updated
-                available = available.first()
-                if not available.is_equal(keyword.about):
-                    available.constraints_other = keyword.about
-                    available.resolution = items["resolution"]
-                    #  save the new value in the DB
-                    available.save()
+        #  create the constraints_other required for RNDT
+        keyword_id = items['access_contraints']
+        keyword = ThesaurusKeyword.objects.get(id=keyword_id) if keyword_id else None
+        #  get the layer available or create it
+        available = LayerRNDT.objects.filter(layer=layer)
+        #  if the object does not exists, will save it for the first time
+        if not available.exists():
+            available = LayerRNDT(
+                layer=layer,
+                constraints_other=keyword.about if keyword else None,
+                resolution=items["resolution"],
+                accuracy=items["accuracy"],
+            )
+            #  save the new value in the DB
+            available.save()
+        else:
+            #  if the object exists and the constraing_other is changed
+            #  the value will be updated
+            available = available.first()
+            available.constraints_other = keyword.about
+            available.resolution = items["resolution"]
+            available.accuracy = items["accuracy"]
+            #  save the new value in the DB
+            available.save()
 
         #  get the value to be saved in constraints_other
         layer_constraint = (
