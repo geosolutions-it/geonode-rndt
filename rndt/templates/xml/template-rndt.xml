@@ -437,9 +437,8 @@
          <gmd:spatialResolution>
             <gmd:MD_Resolution>
                <gmd:distance>
-                  {# TODO #}
                   <gco:Distance
-                     uom="http://standards.iso.org/iso/19139/resources/uom/ML_gmxUom.xml#m">10.0</gco:Distance>
+                     uom="http://standards.iso.org/iso/19139/resources/uom/ML_gmxUom.xml#m">{{layer.id|get_spatial_resolution}}</gco:Distance>
                </gmd:distance>
             </gmd:MD_Resolution>
          </gmd:spatialResolution>
