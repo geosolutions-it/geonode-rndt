@@ -35,3 +35,4 @@ def get_resolution_value(value, layer_id):
     if layer.exists():
         value.initial = layer.get().resolution
         return value
+    return value
