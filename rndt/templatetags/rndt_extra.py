@@ -29,8 +29,17 @@ def get_other_constraint(constraint_id, layer_id):
 
 @register.filter
 def get_resolution_value(value, layer_id):
+    return get_numeric(value, layer_id, "resolution")
+
+
+@register.filter
+def get_accuracy_value(value, layer_id):
+    return get_numeric(value, layer_id, "accuracy")
+
+
+def get_numeric(value, layer_id, category):
     layer = LayerRNDT.objects.filter(layer=layer_id)
     if layer.exists():
-        value.initial = layer.get().resolution
+        value.initial = getattr(layer.get(), category)
         return value
     return value
