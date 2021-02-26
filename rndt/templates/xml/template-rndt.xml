@@ -1,5 +1,6 @@
 {% load thesaurus %}
 {% load metadata_tags %}
+{% load l10n %}
 <gmd:MD_Metadata xmlns:gmd="http://www.isotc211.org/2005/gmd"
                  xmlns:gco="http://www.isotc211.org/2005/gco"
                  xmlns:gml="http://www.opengis.net/gml/3.2"
@@ -118,18 +119,18 @@
       <gmd:MD_DataIdentification>
          <gmd:citation>
             <gmd:CI_Citation>
-               {% if layer.alternate %}
-               <gmd:name>
-                  <gco:CharacterString>{{layer.alternate}}</gco:CharacterString>
-               </gmd:name>
-               {% endif %}
                <gmd:title>
                   <gco:CharacterString>{{layer.title}}</gco:CharacterString>
                </gmd:title>
+               {% if layer.alternate %}
+               <gmd:alternateTitle>
+                  <gco:CharacterString>{{layer.alternate}}</gco:CharacterString>
+               </gmd:alternateTitle>
+               {% endif %}
                <gmd:date>
                   <gmd:CI_Date>
                      <gmd:date>
-                        <gco:Date>{{layer.date|date:"Y-m-d\TH:i:s\Z"}}</gco:Date>
+                        <gco:Date>{{layer.date|date:"Y-m-d"}}</gco:Date>
                      </gmd:date>
                      <gmd:dateType>
                         <gmd:CI_DateTypeCode 
@@ -438,7 +439,7 @@
             <gmd:MD_Resolution>
                <gmd:distance>
                   <gco:Distance
-                     uom="http://standards.iso.org/iso/19139/resources/uom/ML_gmxUom.xml#m">{{layer.id|get_spatial_resolution}}</gco:Distance>
+                     uom="http://standards.iso.org/iso/19139/resources/uom/ML_gmxUom.xml#m">{{layer.id|get_spatial_resolution|unlocalize}}</gco:Distance>
                </gmd:distance>
             </gmd:MD_Resolution>
          </gmd:spatialResolution>
@@ -464,16 +465,16 @@
                <gmd:geographicElement>
                   <gmd:EX_GeographicBoundingBox>
                      <gmd:westBoundLongitude>
-                       <gco:Decimal>{{layer.ll_bbox.0}}</gco:Decimal>
+                       <gco:Decimal>{{layer.ll_bbox.0|unlocalize}}</gco:Decimal>
                      </gmd:westBoundLongitude>
                      <gmd:eastBoundLongitude>
-                       <gco:Decimal>{{layer.ll_bbox.1}}</gco:Decimal>
+                       <gco:Decimal>{{layer.ll_bbox.1|unlocalize}}</gco:Decimal>
                      </gmd:eastBoundLongitude>
                      <gmd:southBoundLatitude>
-                       <gco:Decimal>{{layer.ll_bbox.2}}</gco:Decimal>
+                       <gco:Decimal>{{layer.ll_bbox.2|unlocalize}}</gco:Decimal>
                      </gmd:southBoundLatitude>
                      <gmd:northBoundLatitude>
-                       <gco:Decimal>{{layer.ll_bbox.3}}</gco:Decimal>
+                       <gco:Decimal>{{layer.ll_bbox.3|unlocalize}}</gco:Decimal>
                      </gmd:northBoundLatitude>
                   </gmd:EX_GeographicBoundingBox>
                </gmd:geographicElement>
@@ -515,10 +516,10 @@
          </gmd:contentType>
       </gmd:MD_CoverageDescription>
       {% elif layer.storeType == 'dataStore' %}
-      <gmd:includedWithDataset>
-         <gco:Boolean>0</gco:Boolean>
-      </gmd:includedWithDataset>
       <gmd:MD_FeatureCatalogueDescription>
+         <gmd:includedWithDataset>
+            <gco:Boolean>0</gco:Boolean>
+         </gmd:includedWithDataset>
          <gmd:featureCatalogueCitation 
             uuidref="{{layer.uuid}}" 
             xlink:href="{{ SITEURL }}{{ layer.get_absolute_url }}/feature_catalogue"/>
@@ -610,25 +611,25 @@
          <gmd:transferOptions>
             <gmd:MD_DigitalTransferOptions>
                {# 3.6.3 Risorsa on-line [1..*] #}
-               {# collegamento al servizio di consultazione che fornisce l’accesso online al dataset #}
+               {# collegamento al servizio di consultazione che fornisce l?accesso online al dataset #}
                <gmd:onLine>
                   <gmd:CI_OnlineResource>
                      <gmd:linkage>
                         <gmd:URL>{{ SITEURL }}{{ layer.get_absolute_url }}</gmd:URL>
                      </gmd:linkage>
+                     {# 3.6.3 Req R1.10: Anchor su http://inspire.ec.europa.eu/metadata-codelist/ProtocolValue #}
                      <gmd:protocol>
-                        {# 3.6.3 Req R1.10: Anchor su http://inspire.ec.europa.eu/metadata-codelist/ProtocolValue #}
-                        <gmx:Anchor 
-                           xlink:href="http://www.opengis.net/def/serviceType/ogc/wms">OGC Web Map Service</gmx:Anchor>
+                        <gmx:Anchor
+                           xlink:href="http://inspire.ec.europa.eu/metadata-codelist/SpatialDataServiceCategory/humanCatalogueViewer">Visualizzatore del catalogo [NON UFFICIALE]</gmx:Anchor>
                      </gmd:protocol>
+                     {# 3.6.3 Req R1.10: Anchor  http://inspire.ec.europa.eu/metadata-codelist/SpatialDataServiceType #}
                      <gmd:applicationProfile>
-                        {# 3.6.3 Req R1.10: Anchor  http://inspire.ec.europa.eu/metadata-codelist/SpatialDataServiceType #}
-                        <gmx:Anchor 
-                           xlink:href="http://inspire.ec.europa.eu/metadata-codelist/SpatialDataServiceType/invoke">Servizio di richiesta dei servizi di dati territoriali</gmx:Anchor>
+                        <gmx:Anchor
+                           xlink:href="http://inspire.ec.europa.eu/metadata-codelist/SpatialDataServiceType/other">Altri servizi</gmx:Anchor>
                      </gmd:applicationProfile>
+                     {# 3.6.3 Req R1.10: Anchor fisso su accessPoint #}
                      <gmd:description>
-                        {# 3.6.3 Req R1.10: Anchor fisso su accessPoint #}
-                        <gmx:Anchor 
+                        <gmx:Anchor
                            xlink:href="http://inspire.ec.europa.eu/metadata-codelist/OnLineDescriptionCode/accessPoint">access point</gmx:Anchor>
                      </gmd:description>
                   </gmd:CI_OnlineResource>
@@ -640,24 +641,23 @@
                      <gmd:linkage>
                         <gmd:URL>{{link.url}}</gmd:URL>
                      </gmd:linkage>
+                     {# 3.6.3 Req R1.10: Anchor su http://inspire.ec.europa.eu/metadata-codelist/ProtocolValue #}
                      <gmd:protocol>
-                        {# 3.6.3 Req R1.10: Anchor su http://inspire.ec.europa.eu/metadata-codelist/ProtocolValue #}
-                        {# TODO #}
-                        <gmx:Anchor 
-                           xlink:href="http://www.opengis.net/def/serviceType/ogc/wms">File</gmx:Anchor>
+                        <gmx:Anchor
+                           xlink:href="http://TODO">File</gmx:Anchor>
                      </gmd:protocol>
+                     {# 3.6.3 Req R1.10: Anchor  http://inspire.ec.europa.eu/metadata-codelist/SpatialDataServiceType #}
+                     <gmd:applicationProfile>
+                        <gmx:Anchor
+                           xlink:href="http://inspire.ec.europa.eu/metadata-codelist/SpatialDataServiceType/download">Servizio di scaricamento</gmx:Anchor>
+                     </gmd:applicationProfile>
                      {# name non incluso nelle specifiche RNDT #}
                      <gmd:name>
                         <gco:CharacterString>{{layer.name}}.{{link.extension}}</gco:CharacterString>
                      </gmd:name>
-                     <gmd:applicationProfile>
-                        {# 3.6.3 Req R1.10: Anchor  http://inspire.ec.europa.eu/metadata-codelist/SpatialDataServiceType #}
-                        <gmx:Anchor 
-                           xlink:href="http://inspire.ec.europa.eu/metadata-codelist/SpatialDataServiceType/download">Servizio di scaricamento</gmx:Anchor>
-                     </gmd:applicationProfile>
+                     {# 3.6.3 Req R1.10: Anchor fisso su accessPoint #}
                      <gmd:description>
-                        {# 3.6.3 Req R1.10: Anchor fisso su accessPoint #}
-                        <gmx:Anchor 
+                        <gmx:Anchor
                            xlink:href="http://inspire.ec.europa.eu/metadata-codelist/OnLineDescriptionCode/accessPoint">access point</gmx:Anchor>
                      </gmd:description>
                   </gmd:CI_OnlineResource>
@@ -674,8 +674,8 @@
                         {# ('link_type', models.CharField(max_length=255, choices=[('original','original'), ('data','data'), ('image','image'), ('metadata','metadata'), ('html','html'), ('OGC:WMS','OGC:WMS'), ('OGC:WFS','OGC:WFS'), ('OGC:WCS','OGC:WCS')])),  #}
 
 
+                     {# 3.6.3 Req R1.10: Anchor su http://inspire.ec.europa.eu/metadata-codelist/ProtocolValue #}
                      <gmd:protocol>
-                        {# 3.6.3 Req R1.10: Anchor su http://inspire.ec.europa.eu/metadata-codelist/ProtocolValue #}
                         {% if link.link_type == 'OGC:WMS' %}
                         <gmx:Anchor 
                            xlink:href="http://www.opengis.net/def/serviceType/ogc/wms">OGC Web Map Service</gmx:Anchor>
@@ -690,13 +690,9 @@
                            xlink:href="http://inspire.ec.europa.eu/metadata-codelist/SpatialDataServiceType/other">Unknown</gmx:Anchor>
                         {% endif %}
                      </gmd:protocol>
-                     {# name non incluso nelle specifiche RNDT #}
-                     <gmd:name>
-                        <gco:CharacterString>{{ layer.alternate }}</gco:CharacterString>
-                     </gmd:name>
+                     {# 3.6.3 Req R1.10: Anchor  http://inspire.ec.europa.eu/metadata-codelist/SpatialDataServiceType #}
                      <gmd:applicationProfile>
-                        {# 3.6.3 Req R1.10: Anchor  http://inspire.ec.europa.eu/metadata-codelist/SpatialDataServiceType #}
-                        {% if link.link_type == 'OGC:WMS' %}                        
+                        {% if link.link_type == 'OGC:WMS' %}
                         <gmx:Anchor 
                            xlink:href="http://inspire.ec.europa.eu/metadata-codelist/SpatialDataServiceType/view">Servizio di consultazione</gmx:Anchor>
                         {% elif link.link_type in 'OGC:WFS,OGC:WCS' %}
@@ -707,9 +703,13 @@
                            xlink:href="http://inspire.ec.europa.eu/metadata-codelist/SpatialDataServiceType/other">Altri servizi</gmx:Anchor>
                         {% endif %}                           
                      </gmd:applicationProfile>
+                     {# name non incluso nelle specifiche RNDT #}
+                     <gmd:name>
+                        <gco:CharacterString>{{ layer.alternate }}</gco:CharacterString>
+                     </gmd:name>
+                     {# 3.6.3 Req R1.10: Anchor fisso su accessPoint #}
                      <gmd:description>
-                        {# 3.6.3 Req R1.10: Anchor fisso su accessPoint #}
-                        <gmx:Anchor 
+                        <gmx:Anchor
                            xlink:href="http://inspire.ec.europa.eu/metadata-codelist/OnLineDescriptionCode/accessPoint">access point</gmx:Anchor>
                      </gmd:description>
                   </gmd:CI_OnlineResource>
@@ -746,7 +746,7 @@
                      </gmd:valueUnit>
                      <gmd:value>
                         <gco:Record> 
-                           <gco:Real>{{layer.id|get_positional_accuracy}}</gco:Real>
+                           <gco:Real>{{layer.id|get_positional_accuracy|unlocalize}}</gco:Real>
                         </gco:Record>
                      </gmd:value>
                   </gmd:DQ_QuantitativeResult>
