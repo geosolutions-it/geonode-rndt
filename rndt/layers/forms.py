@@ -49,7 +49,7 @@ class LayerRNDTForm(forms.Form):
         default_choices = [
             ("", "---------"),
             *choices_usability,
-            ("freetext", "Free text"),
+            ("freetext", _("Free text")),
         ]
 
         self.fields["use_constraints"].choices = default_choices
