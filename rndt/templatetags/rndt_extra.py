@@ -15,7 +15,7 @@ def get_access_contraints(constraint_id, layer_id):
         return False
     contraints_saved = LayerRNDT.objects.get(layer=layer_id)
     keyword = ThesaurusKeyword.objects.get(id=constraint_id)
-    return keyword.about in contraints_saved.constraints_other
+    return keyword.about in (contraints_saved.constraints_other or [])
 
 
 @register.filter

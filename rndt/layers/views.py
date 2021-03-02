@@ -66,7 +66,7 @@ def layer_metadata(
             #  if the object exists and the constraing_other is changed
             #  the value will be updated
             available = available.first()
-            available.constraints_other = keyword.about
+            available.constraints_other = keyword.about if keyword else None,
             available.resolution = items["resolution"]
             available.accuracy = items["accuracy"]
             #  save the new value in the DB
