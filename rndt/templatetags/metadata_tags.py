@@ -45,8 +45,14 @@ def is_url(item):
 
 @register.filter
 def get_spatial_resolution(layer_id):
-    return LayerRNDT.objects.get(layer_id=layer_id).resolution
+    resolution = LayerRNDT.objects.filter(layer_id=layer_id)
+    if resolution.exists():
+        return LayerRNDT.objects.get(layer_id=layer_id).resolution
+    return layer_id
 
 @register.filter
 def get_positional_accuracy(layer_id):
-    return LayerRNDT.objects.get(layer_id=layer_id).accuracy
+    accuracy = LayerRNDT.objects.filter(layer_id=layer_id)
+    if accuracy.exists():
+        return LayerRNDT.objects.get(layer_id=layer_id).accuracy
+    return layer_id
