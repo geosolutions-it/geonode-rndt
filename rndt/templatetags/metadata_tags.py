@@ -26,7 +26,9 @@ def get_access_contraints_keyword(layer_id):
     x = LayerRNDT.objects.filter(layer_id=layer_id)
     if x.exists():
         url = x.get().constraints_other
-        return ThesaurusKeyword.objects.get(about=url).alt_label
+        keyword = ThesaurusKeyword.objects.filter(about=url)
+        if keyword.exists():
+            return ThesaurusKeyword.objects.get(about=url).alt_label
     return None
 
 
