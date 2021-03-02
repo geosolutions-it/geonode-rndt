@@ -112,9 +112,10 @@
                                     });
                                     var x = $("#id_use_constraints");
                                     if ((x.val() == 'freetext' || x.val() == '') && "{{layer.constraints_other}}"==='None') {
-                                        console.log("jasdjsadjksda")
+                                        $("select[id$='id_use_constraints']").val("");
+                                        $("textarea[id$='free_text']").val("");
                                     }
-                                    if ((x.val() == 'freetext' || x.val() == '') && "{{layer.constraints_other}}") {
+                                    else if ((x.val() == 'freetext' || x.val() == '') && "{{layer.constraints_other}}") {
                                         $("select[id$='id_use_constraints']").val("freetext");
                                         $("textarea[id$='free_text']").val("{{layer.constraints_other}}");
                                         $("div[id$='free_text']").show();
