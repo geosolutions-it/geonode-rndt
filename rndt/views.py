@@ -5,7 +5,7 @@ from rndt.models import PubblicaAmministrazione
 
 
 class PubblicaAmministrazioneResource(ModelResource):
-    """Tags api"""
+    """PA api"""
 
     def serialize(self, request, data, format, options=None):
         if options is None:
