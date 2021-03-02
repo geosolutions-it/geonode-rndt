@@ -34,7 +34,7 @@ def get_access_contraints_keyword(layer_id):
 def get_use_constraint_keyword(keyword_url):
     t = ThesaurusKeyword.objects.filter(about=keyword_url)
     if t.exists():
-        return ThesaurusKeyword.objects.get(about=keyword_url).about
+        return ThesaurusKeyword.objects.get(about=keyword_url).alt_label
 
 
 @register.filter
