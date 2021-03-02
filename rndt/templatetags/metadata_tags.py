@@ -8,9 +8,7 @@ register = template.Library()
 
 @register.filter
 def get_thesaurus_about(thesaurus_id):
-    t = Thesaurus.objects.filter(id=thesaurus_id)
-    if t.exists():
-        return Thesaurus.objects.get(id=thesaurus_id).about
+    return Thesaurus.objects.get(id=thesaurus_id).about
 
 
 @register.filter
@@ -32,9 +30,7 @@ def get_access_contraints_keyword(layer_id):
 
 @register.filter
 def get_use_constraint_keyword(keyword_url):
-    t = ThesaurusKeyword.objects.filter(about=keyword_url)
-    if t.exists():
-        return ThesaurusKeyword.objects.get(about=keyword_url).about
+    return ThesaurusKeyword.objects.get(about=keyword_url).alt_label
 
 
 @register.filter
