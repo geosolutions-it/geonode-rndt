@@ -20,6 +20,12 @@ Detailed information on the definition of RNDT are available at this [link](http
           'rndt',
           ...
        ]
+   
+   If you have a `local_setting` file, you may want to add the `rndt` app with these lines:
+   
+       geonode_index = INSTALLED_APPS.index('geonode')
+       INSTALLED_APPS = INSTALLED_APPS[:geonode_index]+('rndt',)+INSTALLED_APPS[geonode_index:]
+
 
 1. Run ``python manage.py migrate`` to create the RNDT models.
 
