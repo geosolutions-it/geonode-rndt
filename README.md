@@ -21,42 +21,6 @@ Detailed information on the definition of RNDT are available at this [link](http
           ...
        ]
 
-   **NOTE**: make sure to put '`rndt`' as the first app (or anyway before '`geonode`')
-   
-   If you have a `local_setting` file, you may want to add the `rndt` app with these lines:
-   
-       geonode_index = INSTALLED_APPS.index('geonode')
-       INSTALLED_APPS = INSTALLED_APPS[:geonode_index]+('rndt',)+INSTALLED_APPS[geonode_index:]
-
-1. In `geonode.settings.py` set `DIR` for `TEMPLATES` as `[]` in order to let the app overrides the templates.  
- 
-   If you have a `local_setting` file, you may want to do it with this line:
-   
-       TEMPLATES[0]['DIRS'] = []
-
-1. In order to let the app overrides some static files, move the `AppDirectoriesFinder` as the first item
-   in `geonode.settings.py` in `STATICFILES_FINDERS` settings.  
-   The output should be something like this:
-
-       STATICFILES_FINDERS = (
-          'django.contrib.staticfiles.finders.AppDirectoriesFinder',
-          'django.contrib.staticfiles.finders.FileSystemFinder'
-       )
-
-1. Enable RNDT context processors in `geonode.settings.py` by adding the following line in `TEMPLATES`:
-
-       'OPTIONS': {
-          'context_processors': [
-              ...
-              'rndt.context_processors.rndt_tags'
-          ],
-       }
-
-   If you have a `local_setting` file, you may want to do it with this line:
-
-       TEMPLATES[0]['OPTIONS']['context_processors'].append('rndt.context_processors.rndt_tags')
-
-
 1. Run ``python manage.py migrate`` to create the RNDT models.
 
 1. To enable the `UUIDHandler`, add the following line in the `geonode.settings.py` file:
