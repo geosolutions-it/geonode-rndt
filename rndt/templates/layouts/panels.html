@@ -126,16 +126,20 @@
                 </div>
             </div>
             <div class="col-xs-12 col-lg-4">
-                <div class="">
+                <div>
                     <span><label for="id_resolution" class="control-label required-field">{% trans "Resolution" %}</label></span><br>
-                    <div class="input-group resolution">
-                        <div class="input-group-addon">mt</div>
+                    <div class="custom">
+                        <div class="input-group resolution">
+                            <div class="input-group-addon">mt</div>
                         {{ LayerRNDTForm.resolution|get_resolution_value:layer.id }}
+                        </div>    
                     </div>
-                    <span><label for="id_resolution" class="control-label required-field">{% trans "Positional Accuracy" %}</label></span><br>
-                    <div class="input-group accuracy">
-                        <div class="input-group-addon">mt</div>
-                        {{ LayerRNDTForm.accuracy|get_accuracy_value:layer.id }}
+                    <span><label for="id_accuracy" class="control-label required-field">{% trans "Positional Accuracy" %}</label></span><br>
+                    <div class="custom">
+                        <div class="input-group accuracy">
+                            <div class="input-group-addon">mt</div>
+                            {{ LayerRNDTForm.accuracy|get_accuracy_value:layer.id }}
+                        </div>    
                     </div>
                 </div>
             </div>

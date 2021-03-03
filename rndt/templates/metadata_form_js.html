@@ -38,6 +38,50 @@ $('#completeness-hints .additional-info-hint').click(getTab.bind(null, 3));
     }
 {% endblock target %}
 
+{% block onInputChange %}
+    var onInputChange = function(e){
+            toggleRestrictionsConstraints(e);
+            if(e.target.value !== undefined && e.target.value.trim() === ''){
+                if(!$(e.target).hasClass("input-empty")){
+                    if(isMandatoryField(this)) {
+                        setInputEmpty(e.target, true);
+                        if(!!$(this).closest('#mdinfo').length) {
+                            $(e.target).parent().append(gettext("<p class='xxs-font-size mandatory-warning'>&nbsp;&nbsp;&nbsp;<strong>{% trans "* Field declared Mandatory by the Metadata Schema" %}</strong></p>"));
+                        } else if (!!$(this).closest('.custom').length) {
+                            $(e.target).parent().parent().append(gettext("<p class='xxs-font-size mandatory-warning'>&nbsp;&nbsp;&nbsp;<strong>{% trans "* Field declared Mandatory by the Metadata Schema" %}</strong></p>"));
+                        }
+                        empty++;
+                    }
+                }
+            }
+            else {
+                if($(e.target).hasClass("input-empty")) {
+                    if(isMandatoryField(this)) {
+                        empty--;
+                    }
+                    setInputEmpty(e.target, false);
+                    console.log(e.target.id);
+                    if (e.target.id === 'id_resolution' || e.target.id === 'id_accuracy' ) {
+                        $(e.target).parent().parent().find(".mandatory-warning").remove();
+                    }
+                    $(e.target).parent().find(".mandatory-warning").remove();
+                }
+            }
+
+            if(totalNum == prevNum) {
+                try {
+                    var perc = (totalNum <= 0 ? 0 : (totalNum-empty)/totalNum);
+                        perc = (perc <= 1 ? perc : 1);
+                    updateCompleteness(perc);
+                } catch(err) {
+                    // Log error
+                    // console.log(err);
+                }
+            }
+        };
+{% endblock onInputChange %}
+
+
 {% block trigger_onInputChange %}
 $('#category_form').change(onInputChange).change();
 
@@ -79,3 +123,23 @@ $('#mdinfo').find(":input:not(.value-select):not(.autocomplete)").each(function(
     }
 });
 {% endblock trigger_onInputChange %}
+
+{% block extendcompleteness %}
+var additionalMissing = $('#additionalcontraints').find('.input-empty').length > 0;
+    if (additionalMissing) {
+    var inputs = $('#additionalcontraints').find('.input-empty');
+    var empty = inputs.length;
+    for (var i=0; i<inputs.length; i++) {
+        if (typeof inputs[i].value !== undefined && inputs[i].value !== '') {
+        empty--;
+        }
+    }
+    additionalMissing = empty > 0;
+}
+
+$('#completeness-hints .additional-info-hint')
+.toggleClass('progress-bar-danger', additionalMissing)
+.toggleClass('progress-bar-success', !additionalMissing)
+.attr('title', additionalMissing ? gettext("some schema mandatory fields are missing") : gettext("Metadata Schema mandatory fields completed") )
+.tooltip('fixTitle');
+{% endblock extendcompleteness %}
