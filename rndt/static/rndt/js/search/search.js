@@ -24,7 +24,6 @@
         }
         return data;
     }
-    console.log("ajsjhdksajkhdsajhksda");
     // Load categories, keywords, and regions
     module.load_categories = function ($http, $rootScope, $location) {
         var params = typeof FILTER_TYPE == 'undefined' ? {} : {'type': FILTER_TYPE};
