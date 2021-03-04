@@ -13,7 +13,8 @@ $('#completeness-hints .additional-info-hint').click(getTab.bind(null, 3));
     if(target.id === 'category_form' ||
         target.id === 'id_resource-regions' ||
         target.id === 'id_resource-group' ||
-        target.id === 'id_access_contraints' ||
+        target.id === 'id_access_contraints' || 
+        {{UI_REQUIRED_FIELDS}}.includes(target.id) ||
         target.id === 'id_use_constraints' ||
         target.id === 'id_resolution' ||
         target.id === 'id_accuracy'
@@ -45,8 +46,11 @@ $('#completeness-hints .additional-info-hint').click(getTab.bind(null, 3));
                 if(!$(e.target).hasClass("input-empty")){
                     if(isMandatoryField(this)) {
                         setInputEmpty(e.target, true);
-                        if(!!$(this).closest('#mdinfo').length) {
-                            $(e.target).parent().append(gettext("<p class='xxs-font-size mandatory-warning'>&nbsp;&nbsp;&nbsp;<strong>{% trans "* Field declared Mandatory by the Metadata Schema" %}</strong></p>"));
+                        var mandatoryWarning = "<p class='xxs-font-size mandatory-warning'>&nbsp;&nbsp;&nbsp;<strong>{% trans "* Field declared Mandatory by the Metadata Schema" %}</strong></p>"
+                        if (!!$(this).closest('.check-select').length) {
+                            $(e.target).parent().parent().append(gettext(mandatoryWarning));
+                        } else if (!!$(this).closest('#mdinfo').length) {
+                            $(e.target).parent().append(gettext(mandatoryWarning));
                         } else if (!!$(this).closest('.custom').length) {
                             $(e.target).parent().parent().append(gettext("<p class='xxs-font-size mandatory-warning'>&nbsp;&nbsp;&nbsp;<strong>{% trans "* Field declared Mandatory by the Metadata Schema" %}</strong></p>"));
                         }
@@ -60,7 +64,6 @@ $('#completeness-hints .additional-info-hint').click(getTab.bind(null, 3));
                         empty--;
                     }
                     setInputEmpty(e.target, false);
-                    console.log(e.target.id);
                     if (e.target.id === 'id_resolution' || e.target.id === 'id_accuracy' ) {
                         $(e.target).parent().parent().find(".mandatory-warning").remove();
                     }
@@ -84,6 +87,8 @@ $('#completeness-hints .additional-info-hint').click(getTab.bind(null, 3));
 
 {% block trigger_onInputChange %}
 $('#category_form').change(onInputChange).change();
+
+{{UI_REQUIRED_FIELDS}}.forEach(element => $('#' + element).change(onInputChange).change());
 
 $('#id_access_contraints').change(onInputChange).change();
 $('#id_use_constraints').change(onInputChange).change();
