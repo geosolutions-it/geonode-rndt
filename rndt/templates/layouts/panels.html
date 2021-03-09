@@ -19,7 +19,11 @@
           <a>{% trans "Location and Licenses" %}</a>
       </li>
       <li data-step="3" data-toggle="tab" href="#ownership">
-          <a>{% trans "Optional Metadata" %}</a>
+        {% if UI_REQUIRED_FIELDS %}
+            <a>{% trans "Required Metadata" %}</a>
+        {% else %}
+            <a>{% trans "Optional Metadata" %}</a>
+        {% endif %}
       </li>
       <li data-step="4"  data-toggle="tab" href="#dataset">
           <a>{% trans "Dataset Attributes" %}</a>
@@ -39,9 +43,18 @@
     <div class="advanced-hint progress-bar" role="progressbar" style="width:20%">
       {% trans "Mandatory" %}
     </div>
-    <div class="progress-bar" role="progressbar" style="width:40%">
-      {% trans "Optional" %}
-    </div>
+     {% if UI_REQUIRED_FIELDS %}
+        <div class="metadata-hint progress-bar" role="progressbar" style="width:20%">
+            {% trans "Mandatory" %}
+        </div>
+        <div class="progress-bar" role="progressbar" style="width:20%">
+            {% trans "Optional" %}
+        </div>
+    {% else %}
+        <div class="progress-bar" role="progressbar" style="width:40%">
+            {% trans "Optional" %}
+        </div>
+    {% endif %}
     <div class="additional-info-hint progress-bar" role="progressbar" style="width:20%">
       {% trans "Mandatory" %}
     </div>

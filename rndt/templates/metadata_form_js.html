@@ -86,16 +86,19 @@ $('#completeness-hints .additional-info-hint').click(getTab.bind(null, 3));
 
 
 {% block trigger_onInputChange %}
-$('#category_form').change(onInputChange).change();
-
 {{UI_REQUIRED_FIELDS}}.forEach(element => $('#' + element).change(onInputChange).change());
+$('#category_form').change(onInputChange).change();
+$('#id_resource-group').change(onInputChange).change();
+
+$( ':input[id*="id_tkeywords"][required]:visible').each( function () {
+    $('#' + this.id).change(onInputChange).change();
+});
 
 $('#id_access_contraints').change(onInputChange).change();
 $('#id_use_constraints').change(onInputChange).change();
 $('#id_resolution').change(onInputChange).change();
 $('#id_accuracy').change(onInputChange).change();
 
-$('#id_resource-group').change(onInputChange).change();
 document.querySelector('select[name="resource-keywords"]').onchange=onInputChange
 
 $('#id_resource-regions').change(onInputChange).change();
