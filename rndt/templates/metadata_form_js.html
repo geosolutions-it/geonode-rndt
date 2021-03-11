@@ -1,0 +1,153 @@
+{% extends "metadata_form_js.html" %}
+{% load i18n %}
+{% load static %}
+{% load floppyforms %}
+
+{% block hints %}
+$('#completeness-hints .mandatory-hint').click(getTab.bind(null, 1));
+$('#completeness-hints .advanced-hint').click(getTab.bind(null, 2));
+$('#completeness-hints .additional-info-hint').click(getTab.bind(null, 3));
+{% endblock hints %}
+
+{% block target %}
+    if(target.id === 'category_form' ||
+        target.id === 'id_resource-regions' ||
+        target.id === 'id_resource-group' ||
+        target.id === 'id_access_contraints' || 
+        {{UI_REQUIRED_FIELDS}}.includes(target.id) ||
+        target.id === 'id_use_constraints' ||
+        target.id === 'id_resolution' ||
+        target.id === 'id_accuracy'
+    ) {
+        // group selector
+        $(target).closest('#basicGroupInfo').toggleClass('has-error', empty);
+
+        // category selector
+        $(target).closest('#basicCategoryInfo').toggleClass('has-error', empty);
+        // use constraints selector
+        $(target).closest('#accessConstraintsInfo').toggleClass('has-error', empty);
+        // access constraints selector
+        $(target).closest('#useConstraintsInfo').toggleClass('has-error', empty);
+        // resolution selector
+        $(target).closest('.resolution').toggleClass('has-error', empty);
+        // accuracy selector
+        $(target).closest('.accuracy').toggleClass('has-error', empty);
+
+        // regions container
+        $(target).closest('#regions_multiselect_container').toggleClass('has-error', empty);
+        $(target).toggleClass("input-empty", empty);
+    }
+{% endblock target %}
+
+{% block onInputChange %}
+    var onInputChange = function(e){
+            toggleRestrictionsConstraints(e);
+            if(e.target.value !== undefined && e.target.value.trim() === ''){
+                if(!$(e.target).hasClass("input-empty")){
+                    if(isMandatoryField(this)) {
+                        setInputEmpty(e.target, true);
+                        var mandatoryWarning = "<p class='xxs-font-size mandatory-warning'>&nbsp;&nbsp;&nbsp;<strong>{% trans "* Field declared Mandatory by the Metadata Schema" %}</strong></p>"
+                        if (!!$(this).closest('.check-select').length) {
+                            $(e.target).parent().parent().append(gettext(mandatoryWarning));
+                        } else if (!!$(this).closest('#mdinfo').length) {
+                            $(e.target).parent().append(gettext(mandatoryWarning));
+                        } else if (!!$(this).closest('.custom').length) {
+                            $(e.target).parent().parent().append(gettext("<p class='xxs-font-size mandatory-warning'>&nbsp;&nbsp;&nbsp;<strong>{% trans "* Field declared Mandatory by the Metadata Schema" %}</strong></p>"));
+                        }
+                        empty++;
+                    }
+                }
+            }
+            else {
+                if($(e.target).hasClass("input-empty")) {
+                    if(isMandatoryField(this)) {
+                        empty--;
+                    }
+                    setInputEmpty(e.target, false);
+                    if (e.target.id === 'id_resolution' || e.target.id === 'id_accuracy' ) {
+                        $(e.target).parent().parent().find(".mandatory-warning").remove();
+                    }
+                    $(e.target).parent().find(".mandatory-warning").remove();
+                }
+            }
+
+            if(totalNum == prevNum) {
+                try {
+                    var perc = (totalNum <= 0 ? 0 : (totalNum-empty)/totalNum);
+                        perc = (perc <= 1 ? perc : 1);
+                    updateCompleteness(perc);
+                } catch(err) {
+                    // Log error
+                    // console.log(err);
+                }
+            }
+        };
+{% endblock onInputChange %}
+
+
+{% block trigger_onInputChange %}
+{{UI_REQUIRED_FIELDS}}.forEach(element => $('#' + element).change(onInputChange).change());
+$('#category_form').change(onInputChange).change();
+$('#id_resource-group').change(onInputChange).change();
+
+$( ':input[id*="id_tkeywords"][required]:visible').each( function () {
+    $('#' + this.id).change(onInputChange).change();
+});
+
+$('#id_access_contraints').change(onInputChange).change();
+$('#id_use_constraints').change(onInputChange).change();
+$('#id_resolution').change(onInputChange).change();
+$('#id_accuracy').change(onInputChange).change();
+
+document.querySelector('select[name="resource-keywords"]').onchange=onInputChange
+
+$('#id_resource-regions').change(onInputChange).change();
+$('#id_resource-temporal_extent_end').on('blur', function() {$(this).change(onInputChange).change();})
+$('#id_resource-temporal_extent_start').on('blur', function() {$(this).change(onInputChange).change();})
+$('#mandatory').find(":input:not(.value-select):not(.autocomplete)").each(function(){
+    if(isMandatoryField(this)) {
+        prevNum++;
+    }
+    $('#category_form').on('rendered.bs.select', function() {
+        $('.has-popover').popover({'trigger':'hover'});
+    });
+
+    $(this).change(onInputChange).change();
+
+    if(isMandatoryField(this)){
+        totalNum++;
+    }
+});
+
+$('#mdinfo').find(":input:not(.value-select):not(.autocomplete)").each(function(){
+    if(isMandatoryField(this)) {
+        prevNum++;
+    }
+
+    $(this).change(onInputChange).change();
+
+    if(isMandatoryField(this)){
+        totalNum++;
+    }
+});
+{% endblock trigger_onInputChange %}
+
+{% block extendcompleteness %}
+var additionalMissing = $('#additionalcontraints').find('.input-empty').length > 0;
+    if (additionalMissing) {
+    var inputs = $('#additionalcontraints').find('.input-empty');
+    var empty = inputs.length;
+    for (var i=0; i<inputs.length; i++) {
+        if (typeof inputs[i].value !== undefined && inputs[i].value !== '') {
+        empty--;
+        }
+    }
+    additionalMissing = empty > 0;
+}
+
+$('#completeness-hints .additional-info-hint')
+.toggleClass('progress-bar-danger', additionalMissing)
+.toggleClass('progress-bar-success', !additionalMissing)
+.attr('title', additionalMissing ? gettext("some schema mandatory fields are missing") : gettext("Metadata Schema mandatory fields completed") )
+.tooltip('fixTitle');
+{% endblock extendcompleteness %}

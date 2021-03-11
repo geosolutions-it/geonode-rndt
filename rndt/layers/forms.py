@@ -29,13 +29,13 @@ class LayerRNDTForm(forms.Form):
     resolution = forms.FloatField(
         label=_("resolution choices"),
         required=False,
-        widget=NumberInput(attrs={"class": "form-control"}),
+        widget=NumberInput(attrs={"class": "form-control", "placeholder": 10}),
     )
 
     accuracy = forms.FloatField(
         label=_("accuracy"),
         required=False,
-        widget=NumberInput(attrs={"class": "form-control"}),
+        widget=NumberInput(attrs={"class": "form-control", "placeholder": 0.5}),
     )
 
     def __init__(self, *args, **kwargs):

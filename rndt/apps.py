@@ -18,6 +18,7 @@ def run_setup_hooks(*args, **kwargs):
     from geonode.urls import urlpatterns
 
     LOCAL_ROOT = os.path.abspath(os.path.dirname(__file__))
+
     settings.TEMPLATES[0]["DIRS"].insert(0, os.path.join(LOCAL_ROOT, "templates"))
 
     settings.TEMPLATES[0]["OPTIONS"]["context_processors"].append(
