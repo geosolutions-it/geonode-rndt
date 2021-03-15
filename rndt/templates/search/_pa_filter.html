@@ -2,22 +2,12 @@
 <nav class="filter" ng-cloak>
   <h4><a href="#" class="toggle toggle-nav"><i class="fa fa-chevron-right"></i>{% trans "Public Administration" %}</a></h4>
   <ul class="nav closed" id="pub_ammin">
-  {% if facet_type == 'layers' %}
     {% verbatim %}
-      <li ng-repeat="pa in pubblica_amministrazione">
-        <a data-value="{{ pa.ipa }}" data-filter="uuid__startswith" title="{{ pa.name }}"
-         ng-click="multiple_choice_listener($event)" class="{{pa.active}}">{{ pa.name | limitTo: 25 }}{{ pa.name.length > 25 ? '...' : ''}}
-        </a>
+      <li ng-repeat="pa in pubblica_amministrazione" ng-if="pa.count > 0">
+          <a data-value="{{ pa.ipa }}" data-filter="uuid__startswith" ng-click="multiple_choice_listener($event)" class="{{pa.active}}">{{ pa.name | limitTo: 25 }}{{ pa.name.length > 25 ? '...' : ''}}
+              <span class="badge pull-right">{{ pa.count }}</span>
+          </a>
       </li>
     {% endverbatim %}
-  {% else %}
-    {% verbatim %}
-      <li ng-repeat="pa in pubblica_amministrazione">
-        <a data-value="{{ pa.ipa }}" data-filter="uuid__startswith" title="{{ pa.name }}"
-         ng-click="multiple_choice_listener($event)" class="{{pa.active}}">{{ pa.name | limitTo: 25 }}{{ pa.name.length > 25 ? '...' : ''}}
-        </a>
-      </li>
-    {% endverbatim %}
-  {% endif %}
   </ul>
 </nav>
