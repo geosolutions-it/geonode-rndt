@@ -69,7 +69,7 @@ $('#completeness-hints .additional-info-hint').click(getTab.bind(null, 5));
                         empty--;
                     }
                     setInputEmpty(e.target, false);
-                    if (!!$(e.target).closest('.date').length || e.target.id === 'id_resolution' || e.target.id === 'id_accuracy') { 
+                    if (!!$(e.target).closest('.date').length) { 
                         $(e.target).parent().parent().find(".mandatory-warning").remove();
                     } else {
                         $(e.target).parent().find(".mandatory-warning").remove();
