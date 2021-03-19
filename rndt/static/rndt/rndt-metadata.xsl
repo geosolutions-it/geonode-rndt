@@ -6,6 +6,7 @@
                 xmlns:gco="http://www.isotc211.org/2005/gco"
                 xmlns:gml="http://www.opengis.net/gml/3.2"
                 xmlns:gml2="http://www.opengis.net/gml"
+                xmlns:gmx="http://www.isotc211.org/2005/gmx"
                 xmlns:xlink="http://www.w3.org/1999/xlink"
                 xmlns:srv="http://www.isotc211.org/2005/srv">
 
@@ -15,7 +16,7 @@
         <xsl:variable name="abstract" select="/gmd:MD_Metadata/gmd:identificationInfo[1]/*/gmd:abstract/gco:CharacterString"/>
         <xsl:variable name="titleEN" select="/gmd:MD_Metadata/gmd:identificationInfo[1]/*/gmd:citation/gmd:CI_Citation/gmd:title/gmd:PT_FreeText"/>
         <xsl:variable name="abstractEN" select="/gmd:MD_Metadata/gmd:identificationInfo[1]/*/gmd:abstract/gmd:PT_FreeText"/>
-        <xsl:variable name="keywords" select="/gmd:MD_Metadata/gmd:identificationInfo[1]/*/gmd:descriptiveKeywords/gmd:MD_Keywords" />
+        <xsl:variable name="keywords" select="/gmd:MD_Metadata/gmd:identificationInfo[1]/*/gmd:descriptiveKeywords" />
         <xsl:variable name="res_id_code" select="/gmd:MD_Metadata/gmd:identificationInfo[1]/*/gmd:citation/gmd:CI_Citation/gmd:identifier/*/gmd:code/gco:CharacterString"/>
         <xsl:variable name="res_id_codespace" select="/gmd:MD_Metadata/gmd:identificationInfo[1]/*/gmd:citation/gmd:CI_Citation/gmd:identifier/*/gmd:codeSpace/gco:CharacterString"/>
         <xsl:variable name="hierarchyLevel" select="/gmd:MD_Metadata/gmd:hierarchyLevel/gmd:MD_ScopeCode"/>
@@ -47,7 +48,8 @@
         <xsl:variable name="useLimitation" select="/gmd:MD_Metadata/gmd:identificationInfo[1]/*/gmd:resourceConstraints/gmd:MD_LegalConstraints/gmd:useLimitation/gco:CharacterString"/>
         <xsl:variable name="accessConstraints" select="/gmd:MD_Metadata/gmd:identificationInfo[1]/*/gmd:resourceConstraints/gmd:MD_LegalConstraints/gmd:accessConstraints/gmd:MD_RestrictionCode"/>
         <xsl:variable name="useConstraints" select="/gmd:MD_Metadata/gmd:identificationInfo[1]/*/gmd:resourceConstraints/gmd:MD_LegalConstraints/gmd:useConstraints/gmd:MD_RestrictionCode"/>
-        <xsl:variable name="otherConstraints" select="/gmd:MD_Metadata/gmd:identificationInfo[1]/*/gmd:resourceConstraints/gmd:MD_LegalConstraints/gmd:otherConstraints/gco:CharacterString"/>
+        <xsl:variable name="otherAccessConstraints" select="/gmd:MD_Metadata/gmd:identificationInfo[1]/*/gmd:resourceConstraints/gmd:MD_LegalConstraints[gmd:accessConstraints]/gmd:otherConstraints"/>
+        <xsl:variable name="otherUseConstraints" select="/gmd:MD_Metadata/gmd:identificationInfo[1]/*/gmd:resourceConstraints/gmd:MD_LegalConstraints[gmd:useConstraints]/gmd:otherConstraints"/>
         <xsl:variable name="classification" select="/gmd:MD_Metadata/gmd:identificationInfo[1]/*/gmd:resourceConstraints/gmd:MD_SecurityConstraints/gmd:classification/gmd:MD_ClassificationCode"/>
         <xsl:variable name="fileIdentifier" select="/gmd:MD_Metadata/gmd:fileIdentifier/gco:CharacterString"/>
         <xsl:variable name="metalanguage" select="/gmd:MD_Metadata/gmd:language/gmd:LanguageCode"/>
@@ -188,7 +190,7 @@
 
                 <TABLE>
                     <TR>
-                        <TD COLSPAN="2" class="header">
+                        <TD COLSPAN="4" class="header">
                             <H2>WHAT</H2>
                         </TD>
                     </TR>
@@ -197,7 +199,7 @@
                         <TD class="fixedcol">
                             <strong>Resource Purpose</strong>
                         </TD>
-                        <TD>
+                        <TD COLSPAN="3">
                             <xsl:if test="$purpose">
                                 <xsl:value-of select="$purpose"/>
                             </xsl:if>
@@ -208,7 +210,7 @@
                         <TD>
                             <strong>Spatial Representation Type</strong>
                         </TD>
-                        <TD>
+                        <TD COLSPAN="3">
                             <xsl:for-each select="$representationType">
                                 <xsl:value-of select="."/>
                                 <br/>
@@ -220,7 +222,7 @@
                         <TD>
                             <strong>Topic Category</strong>
                         </TD>
-                        <TD>
+                        <TD COLSPAN="3">
                             <xsl:if test="$topicCategory">
                                 <xsl:for-each select="$topicCategory">
                                     <xsl:choose>
@@ -253,70 +255,53 @@
                     </TR>
                     <!-- Free Keywords -->
                     <TR>
-                        <TD>
+                        <TD ROWSPAN="{count($keywords)}">
                             <strong>Keywords</strong>
                         </TD>
-                        <TD>
-                            <xsl:for-each select="$keywords">
-                                <xsl:if test="not(contains(., 'GEMET')) and not(contains(., '19119'))">
-                                    <xsl:value-of select="."/>
-                                    <br/>
-                                </xsl:if>
+                        <TD COLSPAN="3">
+                            <ul>
+                            <xsl:for-each select="$keywords[not(gmd:MD_Keywords/gmd:thesaurusName)]">
+                                <xsl:for-each select="gmd:MD_Keywords">
+                                    <li><xsl:value-of select="."/></li>
+                                </xsl:for-each>
                             </xsl:for-each>
+                            </ul>
                         </TD>
                     </TR>
-                    <!-- Inspire Dataset Theme -->
-                    <xsl:if test="contains($keywords, 'GEMET')">
-                        <TR>
-                            <TD>
-                                <strong>Inspire Dataset Theme</strong>
-                            </TD>
-                            <TD>
-                                <xsl:for-each select="$keywords">
-                                    <xsl:variable name="thesaurus" select="./gmd:thesaurusName" />
-                                    <xsl:variable name="keyword" select="./gmd:keyword/gco:CharacterString" />
-                                    <xsl:if test="contains($thesaurus, 'GEMET')">
-                                        <xsl:for-each select="$keyword">
-                                            <xsl:value-of select="."/>
-                                        </xsl:for-each>
-                                    </xsl:if>
-                                </xsl:for-each>
-                            </TD>
-                        </TR>
-                    </xsl:if>
-                    <!-- Inspire Service Theme -->
-                    <xsl:if test="contains($keywords, '19119')">
-                        <TR>
-                            <TD>
-                                <strong>Services</strong>
-                            </TD>
-                            <TD>
-                                <xsl:for-each select="$keywords">
-                                    <xsl:variable name="thesaurus" select="./gmd:thesaurusName" />
-                                    <xsl:variable name="keyword" select="./gmd:keyword/gco:CharacterString" />
-                                    <xsl:if test="contains($thesaurus, '19119')">
-                                        <xsl:for-each select="$keyword">
-                                            <xsl:value-of select="."/>
-                                        </xsl:for-each>
-                                    </xsl:if>
-                                </xsl:for-each>
-                            </TD>
-                        </TR>
-                        <TR>
-                            <TD>
-                                <strong>Related Resources</strong>
-                            </TD>
-                            <TD>
-                                <xsl:for-each select="/gmd:MD_Metadata/gmd:identificationInfo[1]/*/srv:operatesOn">
-                                    <xsl:variable name="resURL" select="@xlink:href" />
-                                    <a href="{$resURL}" target="_blank">
-                                        <xsl:value-of select="$resURL"/>
-                                    </a>
-                                    <br/>
-                                </xsl:for-each>
-                            </TD>
-                        </TR>
-                    </xsl:if>
+
+                    <!-- Thesaurus keywords -->
+                    <xsl:for-each select="$keywords[gmd:MD_Keywords/gmd:thesaurusName]">
+                    <TR>
+                        <TD>
+                            <ul>
+                            <xsl:for-each select="gmd:MD_Keywords/gmd:keyword">
+                                <xsl:choose>
+                                    <xsl:when test="gmx:Anchor">
+                                        <li><a href="{gmx:Anchor/@xlink:href}"><xsl:value-of select="."/></a></li>
+                                    </xsl:when>
+                                    <xsl:otherwise>
+                                            <li><xsl:value-of select="."/></li>
+                                    </xsl:otherwise>
+                                </xsl:choose>
+                            </xsl:for-each>
+                            </ul>
+                        </TD>
+                        <TD COLSPAN="2">
+                            <xsl:variable name="th_title" select="gmd:MD_Keywords/gmd:thesaurusName/gmd:CI_Citation/gmd:title"/>
+                            <xsl:variable name="th_date" select="gmd:MD_Keywords/gmd:thesaurusName/gmd:CI_Citation/gmd:date/gmd:CI_Date/gmd:date"/>
+
+                            <xsl:choose>
+                                <xsl:when test="$th_title/gmx:Anchor">
+                                    <strong><a href="{$th_title/gmx:Anchor/@xlink:href}"><xsl:value-of select="$th_title"/></a></strong> (<xsl:value-of select="$th_date"/>)
+                                </xsl:when>
+                                <xsl:otherwise>
+                                    <strong><xsl:value-of select="$th_title"/></strong> (<xsl:value-of select="$th_date"/>)
+                                </xsl:otherwise>
+                            </xsl:choose>
+                        </TD>
+                    </TR>
+                    </xsl:for-each>
+
                 </TABLE>
 
                 <TABLE>
@@ -625,7 +610,7 @@
                             <xsl:choose>
                                 <xsl:when test="(/gmd:MD_Metadata/gmd:dataQualityInfo[1]/gmd:DQ_DataQuality/gmd:report/gmd:DQ_DomainConsistency/gmd:result/gmd:DQ_ConformanceResult/gmd:pass/gco:Boolean='true')">True</xsl:when>
                                 <xsl:when test="(/gmd:MD_Metadata/gmd:dataQualityInfo[1]/gmd:DQ_DataQuality/gmd:report/gmd:DQ_DomainConsistency/gmd:result/gmd:DQ_ConformanceResult/gmd:pass/gco:Boolean='false')">False</xsl:when>
-                                <xsl:otherwise></xsl:otherwise>
+                                <xsl:otherwise>Not evaluated</xsl:otherwise>
                             </xsl:choose>
                         </TD>
                     </TR>
@@ -683,16 +668,6 @@
                                     <strong>
                                         <xsl:value-of select="gmd:organisationName/gco:CharacterString"/>
                                     </strong>
-                                </xsl:if>
-                            </TD>
-                        </TR>
-                        <TR>
-                            <TD>
-                                <strong>Individual Name</strong>
-                            </TD>
-                            <TD>
-                                <xsl:if test="gmd:individualName">
-                                    <xsl:value-of select="gmd:individualName/gco:CharacterString"/>
                                 </xsl:if>
                             </TD>
                         </TR>
@@ -776,12 +751,12 @@
                                     <TR>
                                         <xsl:variable name="name" select="./gmd:CI_OnlineResource/gmd:name" />
                                         <xsl:variable name="descr" select="./gmd:CI_OnlineResource/gmd:description" />
+                                        <xsl:variable name="proto" select="./gmd:CI_OnlineResource/gmd:protocol" />
+                                        <xsl:variable name="appro" select="./gmd:CI_OnlineResource/gmd:applicationProfile" />
+
                                         <TD>
                                             <a href="{./gmd:CI_OnlineResource/gmd:linkage/gmd:URL}">
                                                 <xsl:choose>
-                                                    <xsl:when test="$descr">
-                                                        <xsl:value-of select="$descr"/>
-                                                    </xsl:when>
                                                     <xsl:when test="$name">
                                                         <xsl:value-of select="$name"/>
                                                     </xsl:when>
@@ -790,6 +765,22 @@
                                                     </xsl:otherwise>
                                                 </xsl:choose>
                                             </a>
+                                            <xsl:if test="$proto"> -
+                                                <xsl:choose>
+                                                    <xsl:when test="$proto/gmx:Anchor">
+                                                        <a href="{$proto/gmx:Anchor/@xlink:href}"><xsl:value-of select="$proto"/></a>
+                                                    </xsl:when>
+                                                    <xsl:otherwise><xsl:value-of select="$proto"/></xsl:otherwise>
+                                                </xsl:choose>
+                                            </xsl:if>
+                                            <xsl:if test="$appro"> -
+                                                <xsl:choose>
+                                                    <xsl:when test="$appro/gmx:Anchor">
+                                                        <a href="{$appro/gmx:Anchor/@xlink:href}"><xsl:value-of select="$appro"/></a>
+                                                    </xsl:when>
+                                                    <xsl:otherwise><xsl:value-of select="$appro"/></xsl:otherwise>
+                                                </xsl:choose>
+                                            </xsl:if>
                                         </TD>
                                     </TR>
                                 </xsl:for-each>
@@ -885,10 +876,20 @@
                             <strong>Access limitations</strong>
                         </TD>
                         <TD>
-                            <xsl:for-each select="$accessConstraints">
-                                <xsl:value-of select="."/>
-                                <br/>
+<!--                            <xsl:for-each select="$accessConstraints">-->
+<!--                                <xsl:value-of select="."/>-->
+<!--                                <br/>-->
+<!--                            </xsl:for-each>-->
+
+                            <xsl:for-each select="$otherAccessConstraints">
+                                <xsl:if test="gmx:Anchor">
+                                    <a href="{gmx:Anchor/@xlink:href}"><xsl:value-of select="gmx:Anchor"/></a>
+                                </xsl:if>
+                                <xsl:if test="text()">
+                                    <xsl:value-of select="text()"/>
+                                </xsl:if>
                             </xsl:for-each>
+
                         </TD>
                     </TR>
                     <TR>
@@ -896,23 +897,34 @@
                             <strong>Use restrictions</strong>
                         </TD>
                         <TD>
-                            <xsl:for-each select="$useConstraints">
-                                <xsl:value-of select="."/>
-                                <br/>
-                            </xsl:for-each>
+<!--                            <xsl:for-each select="$useConstraints">-->
+<!--                                <xsl:value-of select="."/>-->
+<!--                                <br/>-->
+<!--                            </xsl:for-each>-->
+                            <xsl:if test="$otherUseConstraints">
+                                <xsl:choose>
+                                    <xsl:when test="$otherUseConstraints/gmx:Anchor">
+                                        <a href="{$otherUseConstraints/gmx:Anchor/@xlink:href}"><xsl:value-of select="$otherUseConstraints"/></a>
+                                    </xsl:when>
+                                    <xsl:otherwise>
+                                        <xsl:value-of select="$otherUseConstraints"/>
+                                    </xsl:otherwise>
+                                </xsl:choose>
+                            </xsl:if>
+
                         </TD>
                     </TR>
-                    <TR>
-                        <TD>
-                            <strong>Other restrictions</strong>
-                        </TD>
-                        <TD>
-                            <xsl:for-each select="$otherConstraints">
-                                <xsl:value-of select="."/>
-                                <br/>
-                            </xsl:for-each>
-                        </TD>
-                    </TR>
+<!--                    <TR>-->
+<!--                        <TD>-->
+<!--                            <strong>Other restrictions</strong>-->
+<!--                        </TD>-->
+<!--                        <TD>-->
+<!--                            <xsl:for-each select="$otherConstraints">-->
+<!--                                <xsl:value-of select="."/>-->
+<!--                                <br/>-->
+<!--                            </xsl:for-each>-->
+<!--                        </TD>-->
+<!--                    </TR>-->
                     <TR>
                         <TD>
                             <strong>Security restrictions</strong>
@@ -940,16 +952,6 @@
                                     <strong>
                                         <xsl:value-of select="gmd:organisationName/gco:CharacterString"/>
                                     </strong>
-                                </xsl:if>
-                            </TD>
-                        </TR>
-                        <TR>
-                            <TD>
-                                <strong>Individual name</strong>
-                            </TD>
-                            <TD>
-                                <xsl:if test="gmd:individualName">
-                                    <xsl:value-of select="gmd:individualName/gco:CharacterString"/>
                                 </xsl:if>
                             </TD>
                         </TR>
@@ -1069,16 +1071,6 @@
                                     <strong>
                                         <xsl:value-of select="gmd:organisationName/gco:CharacterString"/>
                                     </strong>
-                                </xsl:if>
-                            </TD>
-                        </TR>
-                        <TR>
-                            <TD>
-                                <strong>Individual Name</strong>
-                            </TD>
-                            <TD>
-                                <xsl:if test="gmd:individualName">
-                                    <xsl:value-of select="gmd:individualName/gco:CharacterString"/>
                                 </xsl:if>
                             </TD>
                         </TR>
