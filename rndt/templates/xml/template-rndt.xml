@@ -1,6 +1,4 @@
-{% load thesaurus %}
-{% load metadata_tags %}
-{% load l10n %}
+{% load thesaurus %}{% load metadata_tags %}{% load l10n %}
 <gmd:MD_Metadata xmlns:gmd="http://www.isotc211.org/2005/gmd"
                  xmlns:gco="http://www.isotc211.org/2005/gco"
                  xmlns:gml="http://www.opengis.net/gml/3.2"
@@ -634,35 +632,6 @@
                      </gmd:description>
                   </gmd:CI_OnlineResource>
                </gmd:onLine>
-
-               {% for link in layer.link_set.download %}
-               <gmd:onLine>
-                  <gmd:CI_OnlineResource>
-                     <gmd:linkage>
-                        <gmd:URL>{{link.url}}</gmd:URL>
-                     </gmd:linkage>
-                     {# 3.6.3 Req R1.10: Anchor su http://inspire.ec.europa.eu/metadata-codelist/ProtocolValue #}
-                     <gmd:protocol>
-                        <gmx:Anchor
-                           xlink:href="http://TODO">File</gmx:Anchor>
-                     </gmd:protocol>
-                     {# 3.6.3 Req R1.10: Anchor  http://inspire.ec.europa.eu/metadata-codelist/SpatialDataServiceType #}
-                     <gmd:applicationProfile>
-                        <gmx:Anchor
-                           xlink:href="http://inspire.ec.europa.eu/metadata-codelist/SpatialDataServiceType/download">Servizio di scaricamento</gmx:Anchor>
-                     </gmd:applicationProfile>
-                     {# name non incluso nelle specifiche RNDT #}
-                     <gmd:name>
-                        <gco:CharacterString>{{layer.name}}.{{link.extension}}</gco:CharacterString>
-                     </gmd:name>
-                     {# 3.6.3 Req R1.10: Anchor fisso su accessPoint #}
-                     <gmd:description>
-                        <gmx:Anchor
-                           xlink:href="http://inspire.ec.europa.eu/metadata-codelist/OnLineDescriptionCode/accessPoint">access point</gmx:Anchor>
-                     </gmd:description>
-                  </gmd:CI_OnlineResource>
-               </gmd:onLine>
-               {% endfor %}
 
                {% for link in layer.link_set.ows %}
                <gmd:onLine>
