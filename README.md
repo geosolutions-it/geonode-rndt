@@ -36,7 +36,9 @@ Detailed information on the definition of RNDT are available at this [link](http
 
        CATALOG_METADATA_TEMPLATE = 'xml/template-rndt.xml'
 
+1. To customize the XSL transformation to be aligned to the RNDT metadata format, use the provided XSL file:
 
+       CATALOG_METADATA_XSL = '/static/rndt/rndt-metadata.xsl'
 
 
 ## Tests
