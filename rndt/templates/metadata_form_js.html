@@ -99,16 +99,13 @@ $('#id_resource-group').change(onInputChange).change();
 $('#id_resource-date').change(onInputChange).change();
 $('#id_resource-links').change(onInputChange).change();
 
-$( ':input[id*="id_tkeywords"][required]:visible').each( function () {
-    $('#' + this.id).change(onInputChange).change();
-});
-
 $('#id_access_contraints').change(onInputChange).change();
 $('#id_use_constraints').change(onInputChange).change();
 $('#id_resolution').change(onInputChange).change();
 $('#id_accuracy').change(onInputChange).change();
 
-document.querySelector('select[name="resource-keywords"]').onchange=onInputChange
+document.querySelector('select[name="resource-keywords"]').onchange=onInputChange;
+{{REQ_THESAURI}}.forEach(element => document.querySelector('select[name="'+ element + '"]').onchange=onInputChange);
 
 $('#id_resource-regions').change(onInputChange).change();
 $('#id_resource-temporal_extent_end').on('blur', function() {$(this).change(onInputChange).change();})
