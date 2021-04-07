@@ -9,15 +9,3 @@
     {% include "rndt/data_constraints_tab.html" %}
 </div>
 {% endblock other_tab %}
-
-
-{% block layer_fields %}
-    {% for field in layer_form %}
-        {% if field.name != 'use_featureinfo_custom_template' and field.name != 'featureinfo_custom_template' and field.name != 'constraints_other' and field.name != 'restriction_code_type' %}
-        <div style="margin-bottom: 25px">
-          <span><label for="{{ field.id }}">{{ field.label }}</label></span>
-          {{ field }}
-        </div>
-        {% endif %}
-    {% endfor %}
-{% endblock layer_fields %}
