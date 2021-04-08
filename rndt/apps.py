@@ -25,6 +25,12 @@ def run_setup_hooks(*args, **kwargs):
         "rndt.context_processors.rndt_tags"
     )
 
+    rndt_exclude_fields = ['constraints_other', 'restriction_code_type']
+    if hasattr(settings, 'ADVANCED_EDIT_EXCLUDE_FIELD'):
+        settings.ADVANCED_EDIT_EXCLUDE_FIELD += rndt_exclude_fields
+    else:
+        setattr(settings, 'ADVANCED_EDIT_EXCLUDE_FIELD', rndt_exclude_fields)
+
     urlpatterns += [
         url(r"^", include("rndt.api.urls")),
         url(r'^catalogue/', include('rndt.catalogue.urls')),

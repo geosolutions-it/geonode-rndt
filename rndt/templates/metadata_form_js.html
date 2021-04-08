@@ -54,7 +54,7 @@ $('#completeness-hints .additional-info-hint').click(getTab.bind(null, 5));
                             $(e.target).parent().parent().append(gettext(mandatoryWarning));
                         } else if (!!$(this).closest('.check-select').length) {
                             $(e.target).parent().parent().append(gettext(mandatoryWarning));
-                        } else if (!!$(this).closest('#mdinfo').length || !!$(this).closest('#basicDescriptiveInfo').length ) {
+                        } else if (!!$(this).closest('#mdinfo').length || !!$(this).closest('#basicDescriptiveInfo').length || !!$(this).closest('#tadv_req').length || !!$(this).closest('#adv_req').length ) {
                             $(e.target).parent().append(gettext(mandatoryWarning));
                         } else if (!!$(this).closest('.custom').length) {
                             $(e.target).parent().parent().append(gettext("<p class='xxs-font-size mandatory-warning'>&nbsp;&nbsp;&nbsp;<strong>{% trans "* Field declared Mandatory by the Metadata Schema" %}</strong></p>"));
@@ -96,6 +96,13 @@ $('#completeness-hints .additional-info-hint').click(getTab.bind(null, 5));
 {{UI_REQUIRED_FIELDS}}.forEach(element => $('#' + element).change(onInputChange).change());
 $('#category_form').change(onInputChange).change();
 $('#id_resource-group').change(onInputChange).change();
+$('#id_resource-title').change(onInputChange).change();
+$('#id_resource-abstract').change(onInputChange).change();
+$('#id_resource-doi').change(onInputChange).change();
+$('#id_resource-attribution').change(onInputChange).change();
+$('#id_resource-data_quality_statement').change(onInputChange).change();
+$('#id_resource-restriction_code_type').change(onInputChange).change();
+
 $('#id_resource-date').change(onInputChange).change();
 $('#id_resource-links').change(onInputChange).change();
 
@@ -104,8 +111,19 @@ $('#id_use_constraints').change(onInputChange).change();
 $('#id_resolution').change(onInputChange).change();
 $('#id_accuracy').change(onInputChange).change();
 
-document.querySelector('select[name="resource-keywords"]').onchange=onInputChange;
+var selection = document.querySelector('select[name="resource-keywords"]');
+if (selection  !== null) {
+    selection.onchange=onInputChange
+}
+
 {{REQ_THESAURI}}.forEach(element => document.querySelector('select[name="'+ element + '"]').onchange=onInputChange);
+
+// workaround to trigger the change in advanced metadata editing
+// otherwise will remain not-required untill a change on the item
+for (item in {{REQ_THESAURI}}) {
+    $("#id_" + {{REQ_THESAURI}}[item]).trigger("change");
+}
+
 
 $('#id_resource-regions').change(onInputChange).change();
 $('#id_resource-temporal_extent_end').on('blur', function() {$(this).change(onInputChange).change();})
