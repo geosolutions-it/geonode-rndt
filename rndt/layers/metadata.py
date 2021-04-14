@@ -41,11 +41,11 @@ class RNDTMetadataParser:
 
     def __init__(self, exml):
         self.exml = exml
-        self.namespaced = get_namespaces()
+        self.namespaces = get_namespaces()
         self.mdkws = exml.findall(
             util.nspath_eval(
                 "gmd:identificationInfo/gmd:MD_DataIdentification/gmd:descriptiveKeywords/gmd:MD_Keywords",
-                self.namespaced,
+                self.namespaces,
             )
         )
 
@@ -53,7 +53,7 @@ class RNDTMetadataParser:
         '''
         Function responsible to get the access constraints complained with RNDT
         - will take all the instances of LegalConstraints
-          - if the restrinction MD_RestrictionCode under accessConstraints has a codeListValue = otherRestrictions
+          - if the restriction MD_RestrictionCode under accessConstraints has a codeListValue = otherRestrictions
             - If is an anchor item, 
                 - will put in the vals dictionary under constraints_other the thesaurus label if exists
                 - otherwise will put in contraints_other the URL parsed
@@ -64,13 +64,13 @@ class RNDTMetadataParser:
         access_constraints = self.exml.findall(
             util.nspath_eval(
                 'gmd:identificationInfo/gmd:MD_DataIdentification/gmd:resourceConstraints/gmd:MD_LegalConstraints',
-                self.namespaced,
+                self.namespaces,
             )
         )
         for item in access_constraints:
-            md_restrinction_code = item.find(util.nspath_eval("gmd:accessConstraints/gmd:MD_RestrictionCode", self.namespaced))
-            if md_restrinction_code is not None and md_restrinction_code.attrib.get('codeListValue', '') == 'otherRestrictions':
-                acc_constr = item.find(util.nspath_eval("gmd:otherConstraints/gmx:Anchor", self.namespaced))
+            md_restriction_code = item.find(util.nspath_eval("gmd:accessConstraints/gmd:MD_RestrictionCode", self.namespaces))
+            if md_restriction_code is not None and md_restriction_code.attrib.get('codeListValue', '') == 'otherRestrictions':
+                acc_constr = item.find(util.nspath_eval("gmd:otherConstraints/gmx:Anchor", self.namespaces))
                 if acc_constr is not None:
                     url = acc_constr.attrib.get('{http://www.w3.org/1999/xlink}href')
                     t = ThesaurusKeyword.objects.filter(about=url).filter(thesaurus__identifier='LimitationsOnPublicAccess')
@@ -79,7 +79,7 @@ class RNDTMetadataParser:
                     else:
                         vals['constraints_other'] = url
                 else:
-                    use_constrs = item.find(util.nspath_eval("gmd:otherConstraints/gco:CharacterString", self.namespaced)).text
+                    use_constrs = item.find(util.nspath_eval("gmd:otherConstraints/gco:CharacterString", self.namespaces)).text
         return vals, use_constrs
 
 
@@ -87,7 +87,7 @@ class RNDTMetadataParser:
         '''
         Function responsible to get the use constraints complained with RNDT
         - will take all the instances of LegalConstraints
-          - if the restrinction MD_RestrictionCode under useConstraints has a codeListValue = otherRestrictions
+          - if the restriction MD_RestrictionCode under useConstraints has a codeListValue = otherRestrictions
             - If is an anchor item, 
                 - will put in the custom dictionary under rndt the thesaurus label if exists
                 - otherwise will put in custom[rndt] the text and the information extracted in the previous step
@@ -97,13 +97,13 @@ class RNDTMetadataParser:
         use_constraints = self.exml.findall(
             util.nspath_eval(
                 'gmd:identificationInfo/gmd:MD_DataIdentification/gmd:resourceConstraints/gmd:MD_LegalConstraints',
-                self.namespaced,
+                self.namespaces,
             )
         )
         for item in use_constraints:
-            md_restrinction_code = item.find(util.nspath_eval("gmd:useConstraints/gmd:MD_RestrictionCode", self.namespaced))
-            if md_restrinction_code is not None and md_restrinction_code.attrib.get('codeListValue', '') == 'otherRestrictions':
-                use_constr = item.find(util.nspath_eval("gmd:otherConstraints/gmx:Anchor", self.namespaced))
+            md_restriction_code = item.find(util.nspath_eval("gmd:useConstraints/gmd:MD_RestrictionCode", self.namespaces))
+            if md_restriction_code is not None and md_restriction_code.attrib.get('codeListValue', '') == 'otherRestrictions':
+                use_constr = item.find(util.nspath_eval("gmd:otherConstraints/gmx:Anchor", self.namespaces))
                 if use_constr is not None:
                     url = use_constr.attrib.get('{http://www.w3.org/1999/xlink}href')
                     t = ThesaurusKeyword.objects.filter(about=url).filter(thesaurus__identifier='ConditionsApplyingToAccessAndUse')
@@ -125,10 +125,10 @@ class RNDTMetadataParser:
         discarded = []
         for mdkw in self.mdkws:
             tkeys = mdkw.findall(
-                util.nspath_eval("gmd:keyword/gmx:Anchor", self.namespaced)
+                util.nspath_eval("gmd:keyword/gmx:Anchor", self.namespaces)
             )
             keys = mdkw.findall(
-                util.nspath_eval("gmd:keyword/gco:CharacterString", self.namespaced)
+                util.nspath_eval("gmd:keyword/gco:CharacterString", self.namespaces)
             )
             all_keys = tkeys + keys
             if len(all_keys) > 0:
@@ -136,14 +136,14 @@ class RNDTMetadataParser:
                 theme = util.testXMLValue(
                     mdkw.find(
                         util.nspath_eval(
-                            "gmd:type/gmd:MD_KeywordTypeCode", self.namespaced
+                            "gmd:type/gmd:MD_KeywordTypeCode", self.namespaces
                         )
                     )
                 )
 
                 thesaurus_info = mdkw.find(
                     util.nspath_eval(
-                        "gmd:thesaurusName/gmd:CI_Citation", self.namespaced
+                        "gmd:thesaurusName/gmd:CI_Citation", self.namespaces
                     )
                 )
                 k_available, k_not_found, discarded = self._get_keywords(
@@ -158,7 +158,7 @@ class RNDTMetadataParser:
                         thesaurus_info.find(
                             util.nspath_eval(
                                 "gmd:date/gmd:CI_Date/gmd:date/gco:Date",
-                                self.namespaced,
+                                self.namespaces,
                             )
                         )
                     )
@@ -167,7 +167,7 @@ class RNDTMetadataParser:
                         thesaurus_info.find(
                             util.nspath_eval(
                                 "gmd:date/gmd:CI_Date/gmd:dateType/gmd:CI_DateTypeCode",
-                                self.namespaced,
+                                self.namespaces,
                             )
                         )
                     )
@@ -190,7 +190,7 @@ class RNDTMetadataParser:
         """
 
         raw_url = thesaurus_info.find(
-            util.nspath_eval("gmd:title/gmx:Anchor", self.namespaced)
+            util.nspath_eval("gmd:title/gmx:Anchor", self.namespaces)
         )
         url = raw_url.attrib.get('{http://www.w3.org/1999/xlink}href', None)
         evaluator = "gmd:title/gco:CharacterString"
@@ -201,7 +201,7 @@ class RNDTMetadataParser:
                 # first used in case of multiple thesaurus with the same url
                 return t.first().title
         return util.testXMLValue(
-            thesaurus_info.find(util.nspath_eval(evaluator, self.namespaced))
+            thesaurus_info.find(util.nspath_eval(evaluator, self.namespaces))
         )
 
     @staticmethod
