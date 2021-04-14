@@ -120,12 +120,12 @@ class RNDTMetadataParser:
 
         url = thesaurus_info.find(
             util.nspath_eval("gmd:title/gmx:Anchor", self.namespaced)
-        ).values()
+        )
 
         evaluator = "gmd:title/gco:CharacterString"
-        if len(url) > 0:
+        if url is not None:
             evaluator = "gmd:title/gmx:Anchor"
-            t = Thesaurus.objects.filter(about=url[0])
+            t = Thesaurus.objects.filter(about=url.values()[0])
             if t.exists():
                 # first used in case of multiple thesaurus with the same url
                 return t.first().title
