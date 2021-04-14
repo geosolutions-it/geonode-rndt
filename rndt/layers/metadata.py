@@ -6,6 +6,8 @@ from geonode.layers.metadata import convert_keyword, get_tagname
 from owslib import util
 from owslib.iso import get_namespaces
 
+ACCESS_CONSTRAINTS_URL = "http://inspire.ec.europa.eu/metadata-codelist/LimitationsOnPublicAccess/noLimitationshttp://inspire.ec.europa.eu/metadata-codelist/LimitationsOnPublicAccess/noLimitations"
+
 
 def rndt_parser(xml, uuid="", vals={}, regions=[], keywords=[], custom={}):
     # check if document is XML
@@ -26,10 +28,10 @@ def rndt_parser(xml, uuid="", vals={}, regions=[], keywords=[], custom={}):
     keywords, discarded = rndt_parser.resolve_keywords()
     custom["rejected_keywords"] = discarded
 
-    vals, use_constr = rndt_parser.get_access_costraints(vals)
-    custom = rndt_parser.get_use_costraints(custom, use_constr)
-    # resolutions = get_resolutions()
-    # accuracy = get_accuracy()
+    use_constr = rndt_parser.get_access_costraints(vals)
+    rndt_parser.get_use_costraints(custom, use_constr)
+    rndt_parser.get_resolutions(custom)
+    rndt_parser.get_accuracy(custom)
 
     return uuid, vals, regions, keywords, custom
 
@@ -75,12 +77,12 @@ class RNDTMetadataParser:
                     url = acc_constr.attrib.get('{http://www.w3.org/1999/xlink}href')
                     t = ThesaurusKeyword.objects.filter(about=url).filter(thesaurus__identifier='LimitationsOnPublicAccess')
                     if t.exists():
-                        vals['constraints_other'] = t.first().alt_label
-                    else:
                         vals['constraints_other'] = url
+                    else:
+                        vals['constraints_other'] = ACCESS_CONSTRAINTS_URL
                 else:
                     use_constrs = item.find(util.nspath_eval("gmd:otherConstraints/gco:CharacterString", self.namespaces)).text
-        return vals, use_constrs
+        return use_constrs
 
 
     def get_use_costraints(self, custom, acc_constr):        
@@ -108,12 +110,36 @@ class RNDTMetadataParser:
                     url = use_constr.attrib.get('{http://www.w3.org/1999/xlink}href')
                     t = ThesaurusKeyword.objects.filter(about=url).filter(thesaurus__identifier='ConditionsApplyingToAccessAndUse')
                     if t.exists():
-                        custom['rndt'] = {'constraints_other': t.first().alt_label}
+                        custom['rndt'] = {'constraints_other': url}
                     else:
-                        custom['rndt'] = f"{use_constr.text} {acc_constr}" 
+                        custom['rndt'] = {'constraints_other': f"{use_constr.text} {acc_constr}"}
                 else:
-                        custom['rndt'] = f"{use_constr.text} {acc_constr}" 
+                    use_constrs = item.find(util.nspath_eval("gmd:otherConstraints/gco:CharacterString", self.namespaces)).text
+                    custom['rndt'] = {'constraints_other': f"{use_constrs} {acc_constr}"}
         return custom
+
+    def get_resolutions(self, custom):
+        resolution = self.exml.find(
+            util.nspath_eval(
+                'gmd:identificationInfo/gmd:MD_DataIdentification/gmd:spatialResolution/gmd:MD_Resolution/gmd:distance/gco:Distance',
+                self.namespaces,
+            )
+        )
+        if resolution is not None:
+            custom['rndt']['resolution'] = resolution.text
+        return custom
+
+    def get_accuracy(self, custom):
+        accuracy = self.exml.find(
+            util.nspath_eval(
+                'gmd:dataQualityInfo/gmd:DQ_DataQuality/gmd:report/gmd:DQ_AbsoluteExternalPositionalAccuracy/gmd:result/gmd:DQ_QuantitativeResult/gmd:value/gco:Record/gco:Real',
+                self.namespaces,
+            )
+        )
+        if accuracy is not None:
+            custom['rndt']['accuracy'] = accuracy.text
+        return custom
+
 
     def resolve_keywords(self):
         """
@@ -192,14 +218,15 @@ class RNDTMetadataParser:
         raw_url = thesaurus_info.find(
             util.nspath_eval("gmd:title/gmx:Anchor", self.namespaces)
         )
-        url = raw_url.attrib.get('{http://www.w3.org/1999/xlink}href', None)
         evaluator = "gmd:title/gco:CharacterString"
-        if url is not None:
-            evaluator = "gmd:title/gmx:Anchor"
-            t = Thesaurus.objects.filter(about=url)
-            if t.exists():
-                # first used in case of multiple thesaurus with the same url
-                return t.first().title
+        if raw_url is not None:
+            url = raw_url.attrib.get('{http://www.w3.org/1999/xlink}href', None)
+            if url is not None:
+                evaluator = "gmd:title/gmx:Anchor"
+                t = Thesaurus.objects.filter(about=url)
+                if t.exists():
+                    # first used in case of multiple thesaurus with the same url
+                    return t.first().title
         return util.testXMLValue(
             thesaurus_info.find(util.nspath_eval(evaluator, self.namespaces))
         )
