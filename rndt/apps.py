@@ -31,6 +31,11 @@ def run_setup_hooks(*args, **kwargs):
     else:
         setattr(settings, 'ADVANCED_EDIT_EXCLUDE_FIELD', rndt_exclude_fields)
 
+
+    rdt_parsers = ['__DEFAULT__', 'rndt.layers.metadata.rndt_parser']
+    if not hasattr(settings, 'METADATA_PARSERS'):
+        setattr(settings, 'METADATA_PARSERS', rdt_parsers)
+
     urlpatterns += [
         url(r"^", include("rndt.api.urls")),
         url(r'^catalogue/', include('rndt.catalogue.urls')),
