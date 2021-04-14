@@ -34,6 +34,9 @@ def rndt_parser(xml, uuid="", vals={}, regions=[], keywords=[], custom={}):
 
 
 class RNDTMetadataParser:
+    '''
+    RNDTParser, parser complain for parse the RNDT specification
+    '''
     def __init__(self, exml):
         self.exml = exml
         self.namespaced = get_namespaces()
@@ -45,6 +48,10 @@ class RNDTMetadataParser:
         )
 
     def resolve_keywords(self):
+        '''
+        Function to resolve keywords.
+        By xpaths will resove which keywords will used converted for the keyword Handler object
+        '''
         k_not_found = []
         keywords = []
         discarded = []
@@ -107,25 +114,35 @@ class RNDTMetadataParser:
         return keywords, discarded
 
     def _get_thesaurus_title(self, thesaurus_info):
-        title = util.testXMLValue(
-            thesaurus_info.find(
-                util.nspath_eval("gmd:title/gmx:Anchor", self.namespaced)
-            )
-        )
+        '''
+        Will get gather Thesauro title.
+        '''
 
         url = thesaurus_info.find(
             util.nspath_eval("gmd:title/gmx:Anchor", self.namespaced)
-        ).values()[0]
+        ).values()
 
-        t = Thesaurus.objects.filter(about=url)
-
-        if t.exists():
-            # first used in case of multiple thesaurus with the same url
-            return t.first().title
-        return title
+        evaluator = "gmd:title/gco:CharacterString"
+        if len(url) > 0:
+            evaluator = "gmd:title/gmx:Anchor"
+            t = Thesaurus.objects.filter(about=url[0])
+            if t.exists():
+                # first used in case of multiple thesaurus with the same url
+                return t.first().title
+        return util.testXMLValue(
+            thesaurus_info.find(
+                util.nspath_eval(evaluator, self.namespaced)
+            )
+        )
 
     @staticmethod
     def _get_keywords(keywords, thesaurus_info):
+        '''
+        Will decide if a keywords should be mapped as thesaurus keyword or not:
+         - not_tkey = will contains the keywords without thesaurus information
+         - available = will contains the keyword with thesaurus information available in the system
+         - discarded = will contains the keyword with thesaurus information not available in the system
+        '''
         not_tkey = []
         available = []
         discarded = []
