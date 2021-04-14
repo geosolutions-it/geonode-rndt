@@ -23,8 +23,8 @@ def rndt_parser(xml, uuid="", vals={}, regions=[], keywords=[], custom={}):
 
     rndt_parser = RNDTMetadataParser(exml)
 
-    keywords = rndt_parser.resolve_keywords()
-
+    keywords, discarded = rndt_parser.resolve_keywords()
+    custom['rejected_keywords'] = discarded
     #access_costraints = rndt_parser.get_access_costraints(vals)
     # use_costraints = get_use_costraints()
     # resolutions = get_resolutions()
@@ -47,6 +47,7 @@ class RNDTMetadataParser:
     def resolve_keywords(self):
         k_not_found = []
         keywords = []
+        discarded = []
         for mdkw in self.mdkws:
             tkeys = mdkw.findall(
                 util.nspath_eval("gmd:keyword/gmx:Anchor", self.namespaced)
@@ -70,7 +71,7 @@ class RNDTMetadataParser:
                             "gmd:thesaurusName/gmd:CI_Citation", self.namespaced
                         )
                     )
-                    k_available, k_not_found = self._get_keywords(all_keys, thesaurus_info)
+                    k_available, k_not_found, discarded = self._get_keywords(all_keys, thesaurus_info)
 
                     if len(k_not_found) > 0:
                         keywords.extend(convert_keyword(k_not_found, theme=theme))
@@ -103,7 +104,7 @@ class RNDTMetadataParser:
                                 "type": theme,
                             }
                         )
-        return keywords
+        return keywords, discarded
 
     def _get_thesaurus_title(self, thesaurus_info):
         title = util.testXMLValue(
@@ -127,6 +128,7 @@ class RNDTMetadataParser:
     def _get_keywords(keywords, thesaurus_info):
         not_tkey = []
         available = []
+        discarded = []
         for keyword in keywords:
             text = util.testXMLValue(keyword)
             url = keyword.values()
@@ -135,9 +137,9 @@ class RNDTMetadataParser:
                 if k.exists():
                     available.append(k.first().alt_label)
                 else:
-                    continue
+                    discarded.append(text)
             elif thesaurus_info:
                 available.append(text)
             else:
                 not_tkey.append(text)
-        return available, not_tkey
+        return available, not_tkey, discarded
