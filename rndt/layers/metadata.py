@@ -23,10 +23,9 @@ def rndt_parser(xml, uuid="", vals={}, regions=[], keywords=[], custom={}):
 
     rndt_parser = RNDTMetadataParser(exml)
 
-    keywords = rndt_parser.resolve_keywords(keywords)
+    keywords = rndt_parser.resolve_keywords()
 
-    # keyword  = get_keyword ()
-    # access_costraints = get_access_costraints()
+    #access_costraints = rndt_parser.get_access_costraints(vals)
     # use_costraints = get_use_costraints()
     # resolutions = get_resolutions()
     # accuracy = get_accuracy()
@@ -45,18 +44,19 @@ class RNDTMetadataParser:
             )
         )
 
-    def resolve_keywords(self, keywords):
+    def resolve_keywords(self):
         k_not_found = []
+        keywords = []
         for mdkw in self.mdkws:
             tkeys = mdkw.findall(
                 util.nspath_eval("gmd:keyword/gmx:Anchor", self.namespaced)
             )
-            if len(tkeys) > 0:
-                k_available, k_not_found = self._get_keywords(tkeys)
-                if len(k_not_found) > 0:
-                    keywords.extend(convert_keyword(k_not_found))
-
-                if len(k_available) > 0:
+            keys = mdkw.findall(
+                util.nspath_eval("gmd:keyword/gco:CharacterString", self.namespaced)
+            )
+            all_keys = tkeys + keys
+            if len(all_keys) > 0:
+                
                     theme = util.testXMLValue(
                         mdkw.find(
                             util.nspath_eval(
@@ -70,34 +70,39 @@ class RNDTMetadataParser:
                             "gmd:thesaurusName/gmd:CI_Citation", self.namespaced
                         )
                     )
+                    k_available, k_not_found = self._get_keywords(all_keys, thesaurus_info)
 
-                    date = util.testXMLValue(
-                        thesaurus_info.find(
-                            util.nspath_eval(
-                                "gmd:date/gmd:CI_Date/gmd:date/gco:Date", self.namespaced
+                    if len(k_not_found) > 0:
+                        keywords.extend(convert_keyword(k_not_found, theme=theme))
+
+                    if len(k_available) > 0:
+                        date = util.testXMLValue(
+                            thesaurus_info.find(
+                                util.nspath_eval(
+                                    "gmd:date/gmd:CI_Date/gmd:date/gco:Date", self.namespaced
+                                )
                             )
                         )
-                    )
 
-                    dateType = util.testXMLValue(
-                        thesaurus_info.find(
-                            util.nspath_eval(
-                                "gmd:date/gmd:CI_Date/gmd:dateType/gmd:CI_DateTypeCode",
-                                self.namespaced,
+                        dateType = util.testXMLValue(
+                            thesaurus_info.find(
+                                util.nspath_eval(
+                                    "gmd:date/gmd:CI_Date/gmd:dateType/gmd:CI_DateTypeCode",
+                                    self.namespaced,
+                                )
                             )
                         )
-                    )
-                    keywords.append(
-                        {
-                            "keywords": k_available,
-                            "thesaurus": {
-                                "date": date,
-                                "datetype": dateType,
-                                "title": self._get_thesaurus_title(thesaurus_info),
-                            },
-                            "type": theme,
-                        }
-                    )
+                        keywords.append(
+                            {
+                                "keywords": k_available,
+                                "thesaurus": {
+                                    "date": date,
+                                    "datetype": dateType,
+                                    "title": self._get_thesaurus_title(thesaurus_info),
+                                },
+                                "type": theme,
+                            }
+                        )
         return keywords
 
     def _get_thesaurus_title(self, thesaurus_info):
@@ -118,16 +123,21 @@ class RNDTMetadataParser:
             return t.first().title
         return title
 
-    def _get_keywords(self, keywords):
-        not_found = []
+    @staticmethod
+    def _get_keywords(keywords, thesaurus_info):
+        not_tkey = []
         available = []
         for keyword in keywords:
             text = util.testXMLValue(keyword)
-            url = keyword.values()[0]
-
-            k = ThesaurusKeyword.objects.filter(about=url)
-            if k.exists():
-                available.append(k.first().alt_label)
+            url = keyword.values()
+            if len(url) > 0:
+                k = ThesaurusKeyword.objects.filter(about=url[0])
+                if k.exists():
+                    available.append(k.first().alt_label)
+                else:
+                    continue
+            elif thesaurus_info:
+                available.append(text)
             else:
-                not_found.append(text)
-        return available, not_found
+                not_tkey.append(text)
+        return available, not_tkey
