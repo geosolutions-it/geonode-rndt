@@ -28,8 +28,8 @@ def rndt_parser(xml, uuid="", vals={}, regions=[], keywords=[], custom={}):
     keywords, discarded = rndt_parser.resolve_keywords()
     custom["rejected_keywords"] = discarded
 
-    use_constr = rndt_parser.get_access_costraints(vals)
-    rndt_parser.get_use_costraints(custom, use_constr)
+    use_constr = rndt_parser.get_access_costraints(custom)
+    rndt_parser.get_use_costraints(vals, use_constr)
     rndt_parser.get_resolutions(custom)
     rndt_parser.get_accuracy(custom)
 
@@ -51,7 +51,7 @@ class RNDTMetadataParser:
             )
         )
 
-    def get_access_costraints(self, vals):
+    def get_access_costraints(self, custom):
         '''
         Function responsible to get the access constraints complained with RNDT
         - will take all the instances of LegalConstraints
@@ -77,15 +77,15 @@ class RNDTMetadataParser:
                     url = acc_constr.attrib.get('{http://www.w3.org/1999/xlink}href')
                     t = ThesaurusKeyword.objects.filter(about=url).filter(thesaurus__identifier='LimitationsOnPublicAccess')
                     if t.exists():
-                        vals['constraints_other'] = url
+                        custom['rndt'] = {'constraints_other': url}
                     else:
-                        vals['constraints_other'] = ACCESS_CONSTRAINTS_URL
+                        custom['rndt'] = {'constraints_other': ACCESS_CONSTRAINTS_URL}
                 else:
                     use_constrs = item.find(util.nspath_eval("gmd:otherConstraints/gco:CharacterString", self.namespaces)).text
         return use_constrs
 
 
-    def get_use_costraints(self, custom, acc_constr):        
+    def get_use_costraints(self, vals, acc_constr):        
         '''
         Function responsible to get the use constraints complained with RNDT
         - will take all the instances of LegalConstraints
@@ -110,13 +110,13 @@ class RNDTMetadataParser:
                     url = use_constr.attrib.get('{http://www.w3.org/1999/xlink}href')
                     t = ThesaurusKeyword.objects.filter(about=url).filter(thesaurus__identifier='ConditionsApplyingToAccessAndUse')
                     if t.exists():
-                        custom['rndt'] = {'constraints_other': url}
+                        vals['constraints_other'] = url
                     else:
-                        custom['rndt'] = {'constraints_other': f"{use_constr.text} {acc_constr}"}
+                        vals['constraints_other'] = f"{use_constr.text} {acc_constr}"
                 else:
                     use_constrs = item.find(util.nspath_eval("gmd:otherConstraints/gco:CharacterString", self.namespaces)).text
-                    custom['rndt'] = {'constraints_other': f"{use_constrs} {acc_constr}"}
-        return custom
+                    vals['constraints_other'] = f"{use_constr.text} {acc_constr}"
+        return vals
 
     def get_resolutions(self, custom):
         resolution = self.exml.find(
