@@ -6,7 +6,7 @@ from geonode.layers.metadata import convert_keyword, get_tagname
 from owslib import util
 from owslib.iso import get_namespaces
 
-ACCESS_CONSTRAINTS_URL = "http://inspire.ec.europa.eu/metadata-codelist/LimitationsOnPublicAccess/noLimitationshttp://inspire.ec.europa.eu/metadata-codelist/LimitationsOnPublicAccess/noLimitations"
+ACCESS_CONSTRAINTS_URL = "http://inspire.ec.europa.eu/metadata-codelist/LimitationsOnPublicAccess/noLimitations"
 
 
 def rndt_parser(xml, uuid="", vals={}, regions=[], keywords=[], custom={}):
