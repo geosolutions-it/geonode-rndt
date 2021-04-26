@@ -1,5 +1,5 @@
 {% extends "search/search_scripts.html" %}
-{% load static from staticfiles %}
+{% load static %}
 {% block search_scripts_endpoints %}
   CATEGORIES_ENDPOINT = '{% url 'api_dispatch_list' api_name='api' resource_name='categories' %}';
   GROUP_CATEGORIES_ENDPOINT = '{% url 'api_dispatch_list' api_name='api' resource_name='groupcategory' %}';
