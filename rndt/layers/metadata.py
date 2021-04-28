@@ -108,14 +108,19 @@ class RNDTMetadataParser:
                 use_constr = item.find(util.nspath_eval("gmd:otherConstraints/gmx:Anchor", self.namespaces))
                 if use_constr is not None:
                     url = use_constr.attrib.get('{http://www.w3.org/1999/xlink}href')
-                    t = ThesaurusKeyword.objects.filter(about=url).filter(thesaurus__identifier='ConditionsApplyingToAccessAndUse')
+                    t = ThesaurusKeyword.objects\
+                        .filter(about=url)\
+                        .filter(thesaurus__identifier='ConditionsApplyingToAccessAndUse')
                     if t.exists():
                         vals['constraints_other'] = url
                     else:
                         vals['constraints_other'] = f"{use_constr.text} {acc_constr}"
                 else:
-                    use_constrs = item.find(util.nspath_eval("gmd:otherConstraints/gco:CharacterString", self.namespaces)).text
-                    vals['constraints_other'] = f"{use_constr.text} {acc_constr}"
+                    use_constr = item.find(util.nspath_eval("gmd:otherConstraints/gco:CharacterString", self.namespaces))
+                    if use_constr is not None:
+                        vals['constraints_other'] = f"{use_constr.text} {acc_constr}"
+                    else:
+                        vals['constraints_other'] = acc_constr
         return vals
 
     def get_resolutions(self, custom):
