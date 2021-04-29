@@ -93,23 +93,12 @@ $('#completeness-hints .additional-info-hint').click(getTab.bind(null, 5));
 
 
 {% block trigger_onInputChange %}
+
 {{UI_REQUIRED_FIELDS}}.forEach(element => $('#' + element).change(onInputChange).change());
-$('#category_form').change(onInputChange).change();
-$('#id_resource-group').change(onInputChange).change();
-$('#id_resource-title').change(onInputChange).change();
-$('#id_resource-abstract').change(onInputChange).change();
-$('#id_resource-doi').change(onInputChange).change();
-$('#id_resource-attribution').change(onInputChange).change();
-$('#id_resource-data_quality_statement').change(onInputChange).change();
-$('#id_resource-restriction_code_type').change(onInputChange).change();
 
-$('#id_resource-date').change(onInputChange).change();
-$('#id_resource-links').change(onInputChange).change();
-
-$('#id_access_contraints').change(onInputChange).change();
-$('#id_use_constraints').change(onInputChange).change();
-$('#id_resolution').change(onInputChange).change();
-$('#id_accuracy').change(onInputChange).change();
+ui_mandatory_fields.forEach(function(field){
+    $('#'+field).change(onInputChange).change();
+})
 
 var selection = document.querySelector('select[name="resource-keywords"]');
 if (selection  !== null) {
@@ -123,6 +112,7 @@ if (selection  !== null) {
 for (item in {{REQ_THESAURI}}) {
     $("#id_" + {{REQ_THESAURI}}[item]).trigger("change");
 }
+
 
 
 $('#id_resource-regions').change(onInputChange).change();

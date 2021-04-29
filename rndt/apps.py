@@ -39,6 +39,14 @@ def run_setup_hooks(*args, **kwargs):
     if not hasattr(settings, 'METADATA_STORERS'):
         setattr(settings, 'METADATA_STORERS', rndt_storers)
 
+    rndt_required_fields = ['id_access_contraints', 'id_use_constraints', 'id_resolution', 'id_accuracy']
+    if not hasattr(settings, 'UI_DEFAULT_MANDATORY_FIELDS'):
+        setattr(settings, 'UI_DEFAULT_MANDATORY_FIELDS', rndt_required_fields)
+    else:
+        settings.UI_DEFAULT_MANDATORY_FIELDS.extend(rndt_required_fields)
+        setattr(settings, 'UI_DEFAULT_MANDATORY_FIELDS', settings.UI_DEFAULT_MANDATORY_FIELDS)
+
+
     urlpatterns += [
         url(r"^", include("rndt.api.urls")),
         url(r'^catalogue/', include('rndt.catalogue.urls')),
