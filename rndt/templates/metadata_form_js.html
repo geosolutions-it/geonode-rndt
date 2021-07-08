@@ -44,35 +44,47 @@ $('#completeness-hints .additional-info-hint').click(getTab.bind(null, 5));
 
 {% block onInputChange %}
     var onInputChange = function(e){
+            var e_target = null;
+            var e_target_value = null;
+            if (e.target.id == 'tinymce') {
+                e_target = $('#' + $(e.target).data().id)[0];
+                e_target_value = tinymce.get($(e.target).data().id).getContent();
+            }
+            else {
+                e_target = e.target;
+                e_target_value = e.target.value;
+            }
             toggleRestrictionsConstraints(e);
-            if(e.target.value !== undefined && e.target.value.trim() === ''){
-                if(!$(e.target).hasClass("input-empty")){
+            if(e_target_value !== undefined && e_target_value.trim() === ''){
+                if(!$(e_target).hasClass("input-empty")){
                     if(isMandatoryField(this)) {
-                        setInputEmpty(e.target, true);
+                        setInputEmpty(e_target, true);
                         var mandatoryWarning = "<p class='xxs-font-size mandatory-warning'>&nbsp;&nbsp;&nbsp;<strong>{% trans "* Field declared Mandatory by the Metadata Schema" %}</strong></p>"
                         if (!!$(this).closest('.date').length) {
-                            $(e.target).parent().parent().append(gettext(mandatoryWarning));
+                            $(e_target).parent().parent().append(gettext(mandatoryWarning));
                         } else if (!!$(this).closest('.check-select').length) {
-                            $(e.target).parent().parent().append(gettext(mandatoryWarning));
+                            $(e_target).parent().parent().append(gettext(mandatoryWarning));
                         } else if (!!$(this).closest('#mdinfo').length || !!$(this).closest('#basicDescriptiveInfo').length || !!$(this).closest('#tadv_req').length || !!$(this).closest('#adv_req').length ) {
-                            $(e.target).parent().append(gettext(mandatoryWarning));
+                            $(e_target).parent().append(gettext(mandatoryWarning));
                         } else if (!!$(this).closest('.custom').length) {
-                            $(e.target).parent().parent().append(gettext("<p class='xxs-font-size mandatory-warning'>&nbsp;&nbsp;&nbsp;<strong>{% trans "* Field declared Mandatory by the Metadata Schema" %}</strong></p>"));
+                            $(e_target).parent().parent().append(gettext("<p class='xxs-font-size mandatory-warning'>&nbsp;&nbsp;&nbsp;<strong>{% trans "* Field declared Mandatory by the Metadata Schema" %}</strong></p>"));
+                        } else if (e.target.id == 'tinymce') {
+                            $(e_target).parent().append(gettext(mandatoryWarning));
                         }
                         empty++;
                     }
                 }
             }
             else {
-                if($(e.target).hasClass("input-empty")) {
+                if($(e_target).hasClass("input-empty")) {
                     if(isMandatoryField(this)) {
                         empty--;
                     }
-                    setInputEmpty(e.target, false);
-                    if (!!$(e.target).closest('.date').length || e.target.id === 'id_resolution' || e.target.id === 'id_accuracy') { 
-                        $(e.target).parent().parent().find(".mandatory-warning").remove();
+                    setInputEmpty(e_target, false);
+                    if (!!$(e_target).closest('.date').length || e_target.id === 'id_resolution' || e_target.id === 'id_accuracy') { 
+                        $(e_target).parent().parent().find(".mandatory-warning").remove();
                     } else {
-                        $(e.target).parent().find(".mandatory-warning").remove();
+                        $(e_target).parent().find(".mandatory-warning").remove();
                     }
                     
                 }
