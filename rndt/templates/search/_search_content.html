@@ -16,5 +16,7 @@
   {% if SEARCH_FILTERS.EXTENT_ENABLED %}
     {% include "search/_extent_filter.html" %}
   {% endif %}
-  {% include "search/_pa_filter.html" %}
+  {% if facet_type == 'layers' %}  
+    {% include "search/_pa_filter.html" %}
+  {% endif %}
 {% endblock %}
