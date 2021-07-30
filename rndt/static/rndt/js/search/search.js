@@ -683,7 +683,12 @@
         });
 
         $('#region_search_btn').click(function () {
-            $scope.query['regions__name__in'] = $('#region_search_input').val();
+            if ($('#region_search_input').val()){
+                $scope.query['regions__name__in'] = $('#region_search_input').val();
+            }
+            else {
+                delete $scope.query['regions__name__in']
+            }
             query_api($scope.query);
         });
 
