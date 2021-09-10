@@ -1,3 +1,5 @@
+from geonode.catalogue.models import catalogue_post_save
+from geonode.layers.models import Layer
 from rndt.models import LayerRNDT
 
 
@@ -16,4 +18,6 @@ def rndt_storer(layer, custom):
             rndt.resolution=rndt_dict.get("resolution", None)
             rndt.accuracy=rndt_dict.get("accuracy", None)
             rndt.save()
+    
+    catalogue_post_save(layer, Layer)
     return layer
