@@ -1,3 +1,5 @@
+import ast
+
 from defusedxml import ElementTree as dlxml
 # Geonode functionality
 from geonode import GeoNodeException
@@ -130,8 +132,11 @@ class RNDTMetadataParser:
                 self.namespaces,
             )
         )
+        
+        resolution = ast.literal_eval(resolution.text)
         if resolution is not None:
-            custom['rndt']['resolution'] = resolution.text
+            custom['rndt']['resolution'] = resolution
+        
         return custom
 
     def get_accuracy(self, custom):
@@ -141,8 +146,9 @@ class RNDTMetadataParser:
                 self.namespaces,
             )
         )
+        accuracy = ast.literal_eval(accuracy.text)
         if accuracy is not None:
-            custom['rndt']['accuracy'] = accuracy.text
+            custom['rndt']['accuracy'] = accuracy
         return custom
 
 
