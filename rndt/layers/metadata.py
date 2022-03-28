@@ -7,6 +7,7 @@ from geonode.base.models import Thesaurus, ThesaurusKeyword
 from geonode.layers.metadata import convert_keyword, get_tagname
 from owslib import util
 from owslib.iso import get_namespaces
+import logging
 
 ACCESS_CONSTRAINTS_URL = "http://inspire.ec.europa.eu/metadata-codelist/LimitationsOnPublicAccess/noLimitations"
 
@@ -135,7 +136,9 @@ class RNDTMetadataParser:
         
         if resolution is not None:
             custom['rndt']['resolution'] = ast.literal_eval(resolution.text)
-        
+        else:
+            logging.error("Resolution cannot be None, using default value 0")
+            custom['rndt']['resolution'] = 0
         return custom
 
     def get_accuracy(self, custom):
@@ -147,6 +150,9 @@ class RNDTMetadataParser:
         )
         if accuracy is not None:
             custom['rndt']['accuracy'] = ast.literal_eval(accuracy.text)
+        else:
+            logging.error("accuracy cannot be None, using default value 0")            
+            custom['rndt']['accuracy'] = 0
         return custom
 
 
