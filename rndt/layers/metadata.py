@@ -133,9 +133,8 @@ class RNDTMetadataParser:
             )
         )
         
-        resolution = ast.literal_eval(resolution.text)
         if resolution is not None:
-            custom['rndt']['resolution'] = resolution
+            custom['rndt']['resolution'] = ast.literal_eval(resolution.text)
         
         return custom
 
@@ -146,9 +145,8 @@ class RNDTMetadataParser:
                 self.namespaces,
             )
         )
-        accuracy = ast.literal_eval(accuracy.text)
         if accuracy is not None:
-            custom['rndt']['accuracy'] = accuracy
+            custom['rndt']['accuracy'] = ast.literal_eval(accuracy.text)
         return custom
 
 
