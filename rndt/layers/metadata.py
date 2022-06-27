@@ -135,10 +135,10 @@ class RNDTMetadataParser:
         )
         
         if resolution is not None:
-            custom['rndt']['resolution'] = ast.literal_eval(resolution.text)
+            custom['rndt']['resolution'] = resolution if isinstance(resolution, float) else ast.literal_eval(resolution.text)
         else:
             logging.error("Resolution cannot be None, using default value 0")
-            custom['rndt'] = {'resolution': 0}
+            custom['rndt'].update({'resolution': 0})
         return custom
 
     def get_accuracy(self, custom):
@@ -150,10 +150,10 @@ class RNDTMetadataParser:
         )
         accuracy = ast.literal_eval(accuracy.text)
         if accuracy is not None:
-            custom['rndt']['accuracy'] = ast.literal_eval(accuracy.text)
+            custom['rndt']['accuracy'] = accuracy if isinstance(accuracy, float) else ast.literal_eval(accuracy.text)
         else:
             logging.error("accuracy cannot be None, using default value 0")            
-            custom['rndt'] = {"accuracy": 0}
+            custom['rndt'].update({'accuracy': 0})
         return custom
 
 
