@@ -31,6 +31,8 @@ def rndt_parser(xml, uuid="", vals={}, regions=[], keywords=[], custom={}):
     keywords, discarded = rndt_parser.resolve_keywords()
     custom["rejected_keywords"] = discarded
 
+    custom['rndt'] = {}
+
     use_constr = rndt_parser.get_access_costraints(custom)
     rndt_parser.get_use_costraints(vals, use_constr)
     rndt_parser.get_resolutions(custom)
@@ -138,7 +140,7 @@ class RNDTMetadataParser:
             custom['rndt']['resolution'] = resolution if isinstance(resolution, float) else ast.literal_eval(resolution.text)
         else:
             logging.error("Resolution cannot be None, using default value 0")
-            custom['rndt'] = {'resolution': 0}
+            custom['rndt']['resolution'] = 0
         return custom
 
     def get_accuracy(self, custom):
@@ -153,7 +155,7 @@ class RNDTMetadataParser:
             custom['rndt']['accuracy'] = accuracy if isinstance(accuracy, float) else ast.literal_eval(accuracy.text)
         else:
             logging.error("accuracy cannot be None, using default value 0")            
-            custom['rndt'] = {'accuracy': 0}
+            custom['rndt']['accuracy'] = 0
         return custom
 
 
