@@ -1,7 +1,7 @@
 import os
 
 from django.apps import AppConfig
-from django.conf import settings
+from almaviva_geonode import settings
 
 
 class RndtConfig(AppConfig):
@@ -32,12 +32,18 @@ def run_setup_hooks(*args, **kwargs):
         setattr(settings, 'ADVANCED_EDIT_EXCLUDE_FIELD', rndt_exclude_fields)
 
     rdt_parsers = ['__DEFAULT__', 'rndt.layers.metadata.rndt_parser']
-    if not hasattr(settings, 'METADATA_PARSERS'):
+    if not getattr(settings, 'METADATA_PARSERS', None):
         setattr(settings, 'METADATA_PARSERS', rdt_parsers)
+    elif 'rndt.layers.metadata.rndt_parser' not in settings.METADATA_PARSERS:
+        settings.METADATA_PARSERS.extend(["rndt.layers.metadata.rndt_parser"])
+        setattr(settings, "METADATA_PARSERS", settings.METADATA_PARSERS)
 
     rndt_storers = ['rndt.layers.storer.rndt_storer']
-    if not hasattr(settings, 'METADATA_STORERS'):
+    if not getattr(settings, 'METADATA_STORERS', None):
         setattr(settings, 'METADATA_STORERS', rndt_storers)
+    elif rndt_storers[0] not in settings.METADATA_STORERS:
+        settings.METADATA_STORERS.extend(rndt_storers)
+        setattr(settings, "METADATA_STORERS", settings.METADATA_STORERS)
 
     rndt_required_fields = ['id_access_contraints', 'id_use_constraints', 'id_resolution', 'id_accuracy']
     if not hasattr(settings, 'UI_DEFAULT_MANDATORY_FIELDS'):
