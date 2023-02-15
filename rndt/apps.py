@@ -1,7 +1,7 @@
 import os
 
 from django.apps import AppConfig
-from almaviva_geonode import settings
+from django.conf import settings
 
 
 class RndtConfig(AppConfig):
