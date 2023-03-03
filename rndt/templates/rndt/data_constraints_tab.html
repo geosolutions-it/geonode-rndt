@@ -19,7 +19,7 @@
                             class="selectpicker form-control"
                             >
                             {% for item in LayerRNDTForm.access_contraints.field.choices %}
-                                {% if item.0|get_access_contraints:layer.id %}
+                                {% if item.0|get_access_contraints:dataset.id %}
                                 <option  selected value="{{ item.0 }}">
                                 {% else %}
                                 <option  value="{{ item.0 }}">
@@ -38,7 +38,7 @@
                             class="selectpicker form-control"
                             >                                    
                             {% for item in LayerRNDTForm.use_constraints.field.choices %}
-                                {% if item.0|get_other_constraint:layer.id %}
+                                {% if item.0|get_other_constraint:dataset.id %}
                                 <option  selected value="{{ item.0 }}">
                                 {% else %}
                                 <option value="{{ item.0 }}">
@@ -82,14 +82,14 @@
             <div class="custom">
                 <div class="input-group resolution">
                     <div class="input-group-addon">mt</div>
-                {{ LayerRNDTForm.resolution|get_resolution_value:layer.id }}
+                {{ LayerRNDTForm.resolution|get_resolution_value:dataset.id }}
                 </div>    
             </div>
             <span><label for="id_accuracy" class="control-label required-field">{% trans "Positional Accuracy" %}</label></span><br>
             <div class="custom">
                 <div class="input-group accuracy">
                     <div class="input-group-addon">mt</div>
-                    {{ LayerRNDTForm.accuracy|get_accuracy_value:layer.id }}
+                    {{ LayerRNDTForm.accuracy|get_accuracy_value:dataset.id }}
                 </div>    
             </div>
         </div>
