@@ -3,9 +3,9 @@ import re
 
 from django.http import HttpResponse
 from geonode.base.models import ThesaurusKeyword, ThesaurusKeywordLabel
-from geonode.layers.views import (_PERMISSION_MSG_METADATA, _resolve_layer,
+from geonode.layers.views import (_PERMISSION_MSG_METADATA, _resolve_dataset,
                                   check_keyword_write_perms)
-from geonode.layers.views import layer_metadata as geonode_layer_view
+from geonode.layers.views import dataset_metadata as geonode_layer_view
 from geonode.layers.views import logger, login_required
 from rndt.layers.forms import LayerRNDTForm
 from rndt.models import LayerRNDT
@@ -16,12 +16,12 @@ from rndt.models import LayerRNDT
 def layer_metadata(
     request,
     layername,
-    template="layers/layer_metadata.html",
+    template="datasets/dataset_metadata.html",
     ajax=True,
     *args,
     **kwargs,
 ):
-    layer = _resolve_layer(
+    layer = _resolve_dataset(
         request,
         layername,
         "base.change_resourcebase_metadata",

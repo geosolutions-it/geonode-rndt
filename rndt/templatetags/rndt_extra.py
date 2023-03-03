@@ -1,6 +1,6 @@
 from django import template
 from geonode.base.models import ThesaurusKeyword
-from geonode.layers.models import Layer
+from geonode.layers.models import Dataset
 from rndt.models import LayerRNDT
 
 register = template.Library()
@@ -23,7 +23,7 @@ def get_other_constraint(constraint_id, layer_id):
     if constraint_id in ["", "freetext"]:
         return False
     keyword = ThesaurusKeyword.objects.get(id=constraint_id)
-    other_constraint = Layer.objects.get(id=layer_id).constraints_other
+    other_constraint = Dataset.objects.get(id=layer_id).constraints_other
     return keyword.about in (other_constraint or [])
 
 

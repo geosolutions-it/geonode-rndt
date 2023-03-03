@@ -2,9 +2,10 @@ from django.db import models
 from django.db.models import signals
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from geonode.base.models import Link, resourcebase_post_save
+from geonode.base.models import Link 
 from geonode.groups.models import GroupProfile
-from geonode.layers.models import Layer, ResourceBase
+from geonode.layers.models import Dataset, ResourceBase
+from geonode.resource.utils import resourcebase_post_save
 
 from rndt.uuidhandler import UUIDHandler
 
@@ -85,7 +86,7 @@ def _group_post_save(sender, instance, raw, **kwargs):
     # the Ipas are object in this case
     current_ipa, ipa_to_replace = instance._rb_to_update
     if instance.ipa_has_changed and ipa_to_replace:
-        resources = Layer.objects.filter(group_id=instance.group_profile.group_id)
+        resources = Dataset.objects.filter(group_id=instance.group_profile.group_id)
         replace_uuid(resources, current_ipa, ipa_to_replace)
     # updating Links
 
@@ -96,9 +97,10 @@ def _pa_post_save(sender, instance, raw, **kwargs):
     # the Ipas are object in this case
     current_ipa, ipa_to_replace = instance._rb_to_update
     if instance.ipa_has_changed and ipa_to_replace:
-        resources = Layer.objects.filter(uuid__startswith=ipa_to_replace)
+        resources = Dataset.objects.filter(uuid__startswith=ipa_to_replace)
         replace_uuid(resources, current_ipa, ipa_to_replace)
     # updating Links
+
 
 def replace_uuid(resources, current_ipa, ipa_to_replace):
     for resource in resources:
@@ -111,10 +113,12 @@ def replace_uuid(resources, current_ipa, ipa_to_replace):
     print(f"Following resources id has been updated : {r_updated}")
     return r_updated
 
+
 signals.post_save.connect(resourcebase_post_save, sender=ResourceBase)
 
+
 class LayerRNDT(models.Model):
-    layer = models.OneToOneField(Layer, on_delete=models.CASCADE)
+    layer = models.OneToOneField(Dataset, on_delete=models.CASCADE)
     constraints_other = models.TextField(default=None, null=True)
     resolution = models.FloatField(default=None, null=True)
     accuracy = models.FloatField(default=None, null=True)
