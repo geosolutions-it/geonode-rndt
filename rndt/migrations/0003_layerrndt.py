@@ -3,23 +3,53 @@ import logging
 
 import django.db.models.deletion
 from django.db import migrations, models
-
+from django.db import DatabaseError
+from django.db import connections
+from django.db.migrations.recorder import MigrationRecorder
 
 logger = logging.getLogger(__name__)
 
+
+def migration_applied(app_label: str, migration_name: str) -> bool:
+    for alias in connections:
+        try:
+            if (MigrationRecorder.Migration.objects
+                    .using(alias)
+                    .filter(app=app_label, name=migration_name)
+                    .exists()):
+                return True
+        except DatabaseError as e:
+            # django_migrations table does not exist -> no migrations applied
+            logger.info("Error retrieving migrations", exc_info=e)
+            pass
+
+    return False
+
+
 try:
     from geonode.layers.models import Layer
-    logger.info("Linking LayerRNDT to Layer (<4.x)")
+    logger.debug("Linking LayerRNDT to Layer (<4.x)")
 
     fk_pointed_class = 'layers.Layer'
     base_dep = ('layers', '24_initial')
 except ImportError:
     try:
         from geonode.layers.models import Dataset
-        logger.info("Linking LayerRNDT to Dataset (>=4.x)")
-
+        logger.debug("Linking LayerRNDT to Dataset (>=4.x)")
         fk_pointed_class = 'layers.Dataset'
-        base_dep = ('layers', '0038_rename_layer_dataset')
+
+        if migration_applied('rndt', '0003_layerrndt'):
+            # RNDT already installed in 3.3.x - we're migrating from 3.3 to 4.x
+            # we're not supposed to do anything in the DB, since the table is already there,
+            # and the FK will be automatically migrated in the renaming in 0038_rename_layer_dataset.
+            # We can't put 0038_rename_layer_dataset as a dependency or we'll get:
+            # -- django.db.migrations.exceptions.InconsistentMigrationHistory: Migration rndt.0003_layerrndt is applied
+            # -- before its dependency layers.0038_rename_layer_dataset on database 'default'.
+            base_dep = None
+        else:
+            # we need the dataset table created by the base migration
+            base_dep = ('layers', '0038_rename_layer_dataset')
+        logger.debug(f"Depending on {base_dep}")
     except ImportError:
         raise Exception('Can not find base class for LayerRNDT')
 
@@ -28,8 +58,10 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ('rndt', '0001_initial'),
-        base_dep,
     ]
+
+    if base_dep:
+        dependencies.append(base_dep)
 
     operations = [
         migrations.CreateModel(
