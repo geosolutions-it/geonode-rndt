@@ -1,4 +1,5 @@
 import ast
+import logging
 
 from defusedxml import ElementTree as dlxml
 # Geonode functionality
@@ -7,7 +8,6 @@ from geonode.base.models import Thesaurus, ThesaurusKeyword
 from geonode.layers.metadata import convert_keyword, get_tagname
 from owslib import util
 from owslib.iso import get_namespaces
-import logging
 
 ACCESS_CONSTRAINTS_URL = "http://inspire.ec.europa.eu/metadata-codelist/LimitationsOnPublicAccess/noLimitations"
 
@@ -137,7 +137,7 @@ class RNDTMetadataParser:
         )
         
         if resolution is not None:
-            custom['rndt']['resolution'] = resolution if isinstance(resolution, float) else ast.literal_eval(resolution.text)
+            custom['rndt']['resolution'] = (resolution if isinstance(resolution, float) else ast.literal_eval(resolution.text)) or 0
         else:
             logging.error("Resolution cannot be None, using default value 0")
             custom['rndt']['resolution'] = 0
@@ -150,9 +150,8 @@ class RNDTMetadataParser:
                 self.namespaces,
             )
         )
-        accuracy = ast.literal_eval(accuracy.text)
         if accuracy is not None:
-            custom['rndt']['accuracy'] = accuracy if isinstance(accuracy, float) else ast.literal_eval(accuracy.text)
+            custom['rndt']['accuracy'] = (accuracy if isinstance(accuracy, float) else ast.literal_eval(accuracy.text)) or 0
         else:
             logging.error("accuracy cannot be None, using default value 0")            
             custom['rndt']['accuracy'] = 0
