@@ -17,6 +17,8 @@ def layer_metadata(
     request,
     layername,
     template="datasets/dataset_metadata.html",
+    panel_template="layouts/panels.html",
+    custom_metadata=None,
     ajax=True,
     *args,
     **kwargs,
@@ -92,4 +94,4 @@ def layer_metadata(
         #  reset the request as immutable
         request.POST._mutable = False
 
-    return geonode_layer_view(request, layername, template, ajax, *args, **kwargs)
+    return geonode_layer_view(request, layername, template, panel_template, custom_metadata, ajax, *args, **kwargs)
