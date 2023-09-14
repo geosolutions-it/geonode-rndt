@@ -20,14 +20,13 @@ def rndt_parser(xml, uuid="", vals={}, regions=[], keywords=[], custom={}):
         raise GeoNodeException(f"Uploaded XML document is not XML: {str(err)}")
 
     # check if document is an accepted XML metadata format
-    tagname = get_tagname(exml)
-
     if tagname == "GetRecordByIdResponse":  # strip CSW element
         try:
             exml = exml.getchildren()[0]
-            tagname = get_tagname(exml)
         except:
             exml = list(exml)[0]
+
+    tagname = get_tagname(exml)
 
     rndt_parser = RNDTMetadataParser(exml)
 
