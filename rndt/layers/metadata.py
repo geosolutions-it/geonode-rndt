@@ -23,8 +23,11 @@ def rndt_parser(xml, uuid="", vals={}, regions=[], keywords=[], custom={}):
     tagname = get_tagname(exml)
 
     if tagname == "GetRecordByIdResponse":  # strip CSW element
-        exml = exml.getchildren()[0]
-        tagname = get_tagname(exml)
+        try:
+            exml = exml.getchildren()[0]
+            tagname = get_tagname(exml)
+        except:
+            exml = list(exml)[0]
 
     rndt_parser = RNDTMetadataParser(exml)
 
