@@ -21,9 +21,11 @@ def rndt_parser(xml, uuid="", vals={}, regions=[], keywords=[], custom={}):
 
     # check if document is an accepted XML metadata format
     tagname = get_tagname(exml)
-
     if tagname == "GetRecordByIdResponse":  # strip CSW element
-        exml = exml.getchildren()[0]
+        try:
+            exml = exml.getchildren()[0]
+        except:
+            exml = list(exml)[0]
         tagname = get_tagname(exml)
 
     rndt_parser = RNDTMetadataParser(exml)
