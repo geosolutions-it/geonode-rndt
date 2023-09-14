@@ -25,8 +25,7 @@ def rndt_parser(xml, uuid="", vals={}, regions=[], keywords=[], custom={}):
             exml = exml.getchildren()[0]
         except:
             exml = list(exml)[0]
-
-    tagname = get_tagname(exml)
+        tagname = get_tagname(exml)
 
     rndt_parser = RNDTMetadataParser(exml)
 
