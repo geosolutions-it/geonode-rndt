@@ -3,7 +3,7 @@ from django.conf import settings
 from django.forms import models
 from django.forms.widgets import NumberInput
 from django.utils.translation import get_language
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from geonode.base.models import ThesaurusKeyword, ThesaurusKeywordLabel
 
 

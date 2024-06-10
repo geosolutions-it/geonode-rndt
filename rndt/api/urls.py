@@ -1,4 +1,5 @@
-from django.conf.urls import include, url
+
+from django.urls import re_path, include
 from geonode.api.urls import api
 from rndt.views import PubblicaAmministrazioneResource
 
@@ -7,5 +8,5 @@ api.register(PubblicaAmministrazioneResource())
 pubblica_amministrazione = PubblicaAmministrazioneResource()
 
 urlpatterns = [
-    url(r'^(?P<api_name>api)/', include(pubblica_amministrazione.urls), name="pubblica_amministrazione")
+    re_path(r'^(?P<api_name>api)/', include(pubblica_amministrazione.urls), name="pubblica_amministrazione")
 ]
