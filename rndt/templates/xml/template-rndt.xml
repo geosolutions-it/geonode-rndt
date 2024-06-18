@@ -364,7 +364,7 @@
                {% if keyword.thesaurus.id == thesaurus_id %}
                <gmd:keyword>
                   <gmx:Anchor 
-                     xlink:href="{{keyword.about}}">{{keyword.alt_label}}</gmx:Anchor>
+                     xlink:href="{{keyword.about}}">{{keyword|rndt_get_localized_tkeyword}}</gmx:Anchor>
                </gmd:keyword>
                {% endif %}
                {% endfor %}

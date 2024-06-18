@@ -1,6 +1,6 @@
 from django import template
 from django.core.validators import URLValidator
-from geonode.base.models import Thesaurus, ThesaurusKeyword
+from geonode.base.models import Thesaurus, ThesaurusKeyword, ThesaurusKeywordLabel
 from rndt.models import LayerRNDT
 
 register = template.Library()
@@ -11,6 +11,16 @@ def get_thesaurus_about(thesaurus_id):
     t = Thesaurus.objects.filter(id=thesaurus_id)
     if t.exists():
         return Thesaurus.objects.get(id=thesaurus_id).about
+
+
+@register.filter
+def rndt_get_localized_tkeyword(tkeyword: ThesaurusKeyword):
+    for lang in ('it', 'en'):
+        t = ThesaurusKeywordLabel.objects.filter(keyword=tkeyword, lang=lang)
+        if t.exists():
+            return t.first().label
+
+    return tkeyword.alt_label
 
 
 @register.filter
