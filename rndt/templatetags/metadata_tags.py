@@ -15,7 +15,7 @@ def get_thesaurus_about(thesaurus_id):
 
 @register.filter
 def rndt_get_localized_tkeyword(tkeyword: ThesaurusKeyword):
-    for lang in ('it', 'en'):
+    for lang in ("it", "en"):
         t = ThesaurusKeywordLabel.objects.filter(keyword=tkeyword, lang=lang)
         if t.exists():
             return t.first().label
@@ -55,7 +55,7 @@ def is_url(item):
         validator = URLValidator()
         validator(item)
         return True
-    except:
+    except Exception:
         return False
 
 
@@ -64,6 +64,7 @@ def get_spatial_resolution(layer_id):
     resolution = LayerRNDT.objects.filter(layer_id=layer_id)
     if resolution.exists():
         return LayerRNDT.objects.get(layer_id=layer_id).resolution
+
 
 @register.filter
 def get_positional_accuracy(layer_id):

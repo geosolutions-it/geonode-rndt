@@ -2,6 +2,7 @@ import ast
 import logging
 
 from defusedxml import ElementTree as dlxml
+
 # Geonode functionality
 from geonode import GeoNodeException
 from geonode.base.models import Thesaurus, ThesaurusKeyword
@@ -28,7 +29,7 @@ def rndt_parser(xml, uuid="", vals={}, regions=[], keywords=[], custom={}):
     keywords, discarded = rndt_parser.resolve_keywords()
     custom["rejected_keywords"] = discarded
 
-    custom['rndt'] = {}
+    custom["rndt"] = {}
 
     use_constr = rndt_parser.get_access_costraints(custom)
     rndt_parser.get_use_costraints(vals, use_constr)
@@ -54,106 +55,124 @@ class RNDTMetadataParser:
         )
 
     def get_access_costraints(self, custom):
-        '''
+        """
         Function responsible to get the access constraints complained with RNDT
         - will take all the instances of LegalConstraints
           - if the restriction MD_RestrictionCode under accessConstraints has a codeListValue = otherRestrictions
-            - If is an anchor item, 
+            - If is an anchor item,
                 - will put in the vals dictionary under constraints_other the thesaurus label if exists
                 - otherwise will put in contraints_other the URL parsed
             - if is a charstring:
                 - will save the value extracted in a variable since is required for get the use_constrains
-        '''
+        """
         use_constrs = ""
         access_constraints = self.exml.findall(
             util.nspath_eval(
-                'gmd:identificationInfo/gmd:MD_DataIdentification/gmd:resourceConstraints/gmd:MD_LegalConstraints',
+                "gmd:identificationInfo/gmd:MD_DataIdentification/gmd:resourceConstraints/gmd:MD_LegalConstraints",
                 self.namespaces,
             )
         )
         for item in access_constraints:
-            md_restriction_code = item.find(util.nspath_eval("gmd:accessConstraints/gmd:MD_RestrictionCode", self.namespaces))
-            if md_restriction_code is not None and md_restriction_code.attrib.get('codeListValue', '') == 'otherRestrictions':
+            md_restriction_code = item.find(
+                util.nspath_eval("gmd:accessConstraints/gmd:MD_RestrictionCode", self.namespaces)
+            )
+            if (
+                md_restriction_code is not None
+                and md_restriction_code.attrib.get("codeListValue", "") == "otherRestrictions"
+            ):
                 acc_constr = item.find(util.nspath_eval("gmd:otherConstraints/gmx:Anchor", self.namespaces))
                 if acc_constr is not None:
-                    url = acc_constr.attrib.get('{http://www.w3.org/1999/xlink}href')
-                    t = ThesaurusKeyword.objects.filter(about=url).filter(thesaurus__identifier='LimitationsOnPublicAccess')
+                    url = acc_constr.attrib.get("{http://www.w3.org/1999/xlink}href")
+                    t = ThesaurusKeyword.objects.filter(about=url).filter(
+                        thesaurus__identifier="LimitationsOnPublicAccess"
+                    )
                     if t.exists():
-                        custom['rndt'] = {'constraints_other': url}
+                        custom["rndt"] = {"constraints_other": url}
                     else:
-                        custom['rndt'] = {'constraints_other': ACCESS_CONSTRAINTS_URL}
+                        custom["rndt"] = {"constraints_other": ACCESS_CONSTRAINTS_URL}
                 else:
-                    use_constrs = item.find(util.nspath_eval("gmd:otherConstraints/gco:CharacterString", self.namespaces)).text
+                    use_constrs = item.find(
+                        util.nspath_eval("gmd:otherConstraints/gco:CharacterString", self.namespaces)
+                    ).text
         return use_constrs
 
-
-    def get_use_costraints(self, vals, acc_constr):        
-        '''
+    def get_use_costraints(self, vals, acc_constr):
+        """
         Function responsible to get the use constraints complained with RNDT
         - will take all the instances of LegalConstraints
           - if the restriction MD_RestrictionCode under useConstraints has a codeListValue = otherRestrictions
-            - If is an anchor item, 
+            - If is an anchor item,
                 - will put in the custom dictionary under rndt the thesaurus label if exists
                 - otherwise will put in custom[rndt] the text and the information extracted in the previous step
             - if is a charstring:
                 - will put in custom[rndt] the text and the information extracted in the previous step
-        '''
+        """
         use_constraints = self.exml.findall(
             util.nspath_eval(
-                'gmd:identificationInfo/gmd:MD_DataIdentification/gmd:resourceConstraints/gmd:MD_LegalConstraints',
+                "gmd:identificationInfo/gmd:MD_DataIdentification/gmd:resourceConstraints/gmd:MD_LegalConstraints",
                 self.namespaces,
             )
         )
         for item in use_constraints:
-            md_restriction_code = item.find(util.nspath_eval("gmd:useConstraints/gmd:MD_RestrictionCode", self.namespaces))
-            if md_restriction_code is not None and md_restriction_code.attrib.get('codeListValue', '') == 'otherRestrictions':
+            md_restriction_code = item.find(
+                util.nspath_eval("gmd:useConstraints/gmd:MD_RestrictionCode", self.namespaces)
+            )
+            if (
+                md_restriction_code is not None
+                and md_restriction_code.attrib.get("codeListValue", "") == "otherRestrictions"
+            ):
                 use_constr = item.find(util.nspath_eval("gmd:otherConstraints/gmx:Anchor", self.namespaces))
                 if use_constr is not None:
-                    url = use_constr.attrib.get('{http://www.w3.org/1999/xlink}href')
-                    t = ThesaurusKeyword.objects\
-                        .filter(about=url)\
-                        .filter(thesaurus__identifier='ConditionsApplyingToAccessAndUse')
+                    url = use_constr.attrib.get("{http://www.w3.org/1999/xlink}href")
+                    t = ThesaurusKeyword.objects.filter(about=url).filter(
+                        thesaurus__identifier="ConditionsApplyingToAccessAndUse"
+                    )
                     if t.exists():
-                        vals['constraints_other'] = url
+                        vals["constraints_other"] = url
                     else:
-                        vals['constraints_other'] = f"{use_constr.text} {acc_constr}"
+                        vals["constraints_other"] = f"{use_constr.text} {acc_constr}"
                 else:
-                    use_constr = item.find(util.nspath_eval("gmd:otherConstraints/gco:CharacterString", self.namespaces))
+                    use_constr = item.find(
+                        util.nspath_eval("gmd:otherConstraints/gco:CharacterString", self.namespaces)
+                    )
                     if use_constr is not None:
-                        vals['constraints_other'] = f"{use_constr.text} {acc_constr}"
+                        vals["constraints_other"] = f"{use_constr.text} {acc_constr}"
                     else:
-                        vals['constraints_other'] = acc_constr
+                        vals["constraints_other"] = acc_constr
         return vals
 
     def get_resolutions(self, custom):
         resolution = self.exml.find(
             util.nspath_eval(
-                'gmd:identificationInfo/gmd:MD_DataIdentification/gmd:spatialResolution/gmd:MD_Resolution/gmd:distance/gco:Distance',
+                "gmd:identificationInfo/gmd:MD_DataIdentification/gmd:spatialResolution/gmd:MD_Resolution/gmd:distance/gco:Distance",
                 self.namespaces,
             )
         )
-        
+
         if resolution is not None:
-            custom['rndt']['resolution'] = (resolution if isinstance(resolution, float) else ast.literal_eval(resolution.text)) or 0
+            custom["rndt"]["resolution"] = (
+                resolution if isinstance(resolution, float) else ast.literal_eval(resolution.text)
+            ) or 0
         else:
             logging.error("Resolution cannot be None, using default value 0")
-            custom['rndt']['resolution'] = 0
+            custom["rndt"]["resolution"] = 0
         return custom
 
     def get_accuracy(self, custom):
         accuracy = self.exml.find(
             util.nspath_eval(
-                'gmd:dataQualityInfo/gmd:DQ_DataQuality/gmd:report/gmd:DQ_AbsoluteExternalPositionalAccuracy/gmd:result/gmd:DQ_QuantitativeResult/gmd:value/gco:Record/gco:Real',
+                "gmd:dataQualityInfo/gmd:DQ_DataQuality/gmd:report/gmd:DQ_AbsoluteExternalPositionalAccuracy/gmd:result/gmd:DQ_QuantitativeResult/gmd:value/gco:Record/gco:Real",
                 self.namespaces,
             )
         )
         if accuracy is not None:
-            custom['rndt']['accuracy'] = (accuracy if isinstance(accuracy, float) else ast.literal_eval(accuracy.text)) or 0
+            custom["rndt"]["accuracy"] = (
+                accuracy if isinstance(accuracy, float) else ast.literal_eval(accuracy.text)
+            ) or 0
         else:
-            logging.error("accuracy cannot be None, using default value 0")            
-            custom['rndt']['accuracy'] = 0
+            logging.error("accuracy cannot be None, using default value 0")
+            custom["rndt"]["accuracy"] = 0
         return custom
-
 
     def resolve_keywords(self):
         """
@@ -164,31 +183,16 @@ class RNDTMetadataParser:
         keywords = []
         discarded = []
         for mdkw in self.mdkws:
-            tkeys = mdkw.findall(
-                util.nspath_eval("gmd:keyword/gmx:Anchor", self.namespaces)
-            )
-            keys = mdkw.findall(
-                util.nspath_eval("gmd:keyword/gco:CharacterString", self.namespaces)
-            )
+            tkeys = mdkw.findall(util.nspath_eval("gmd:keyword/gmx:Anchor", self.namespaces))
+            keys = mdkw.findall(util.nspath_eval("gmd:keyword/gco:CharacterString", self.namespaces))
             all_keys = tkeys + keys
             if len(all_keys) > 0:
-
                 theme = util.testXMLValue(
-                    mdkw.find(
-                        util.nspath_eval(
-                            "gmd:type/gmd:MD_KeywordTypeCode", self.namespaces
-                        )
-                    )
+                    mdkw.find(util.nspath_eval("gmd:type/gmd:MD_KeywordTypeCode", self.namespaces))
                 )
 
-                thesaurus_info = mdkw.find(
-                    util.nspath_eval(
-                        "gmd:thesaurusName/gmd:CI_Citation", self.namespaces
-                    )
-                )
-                k_available, k_not_found, discarded = self._get_keywords(
-                    all_keys, thesaurus_info
-                )
+                thesaurus_info = mdkw.find(util.nspath_eval("gmd:thesaurusName/gmd:CI_Citation", self.namespaces))
+                k_available, k_not_found, discarded = self._get_keywords(all_keys, thesaurus_info)
 
                 if len(k_not_found) > 0:
                     keywords.extend(convert_keyword(k_not_found, theme=theme))
@@ -229,21 +233,17 @@ class RNDTMetadataParser:
         Will get gather Thesauro title.
         """
 
-        raw_url = thesaurus_info.find(
-            util.nspath_eval("gmd:title/gmx:Anchor", self.namespaces)
-        )
+        raw_url = thesaurus_info.find(util.nspath_eval("gmd:title/gmx:Anchor", self.namespaces))
         evaluator = "gmd:title/gco:CharacterString"
         if raw_url is not None:
-            url = raw_url.attrib.get('{http://www.w3.org/1999/xlink}href', None)
+            url = raw_url.attrib.get("{http://www.w3.org/1999/xlink}href", None)
             if url is not None:
                 evaluator = "gmd:title/gmx:Anchor"
                 t = Thesaurus.objects.filter(about=url)
                 if t.exists():
                     # first used in case of multiple thesaurus with the same url
                     return t.first().title
-        return util.testXMLValue(
-            thesaurus_info.find(util.nspath_eval(evaluator, self.namespaces))
-        )
+        return util.testXMLValue(thesaurus_info.find(util.nspath_eval(evaluator, self.namespaces)))
 
     @staticmethod
     def _get_keywords(keywords, thesaurus_info):
@@ -258,7 +258,7 @@ class RNDTMetadataParser:
         discarded = []
         for keyword in keywords:
             text = util.testXMLValue(keyword)
-            url = keyword.attrib.get('{http://www.w3.org/1999/xlink}href', None)
+            url = keyword.attrib.get("{http://www.w3.org/1999/xlink}href", None)
             if url is not None:
                 k = ThesaurusKeyword.objects.filter(about=url)
                 if k.exists():

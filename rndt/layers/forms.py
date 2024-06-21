@@ -1,6 +1,5 @@
 from django import forms
-from django.conf import settings
-from django.forms import models
+
 from django.forms.widgets import NumberInput
 from django.utils.translation import get_language
 from django.utils.translation import ugettext_lazy as _
@@ -11,14 +10,9 @@ class LayerRNDTForm(forms.Form):
     class Meta:
         fields = ["access_contraints", "use_constraints", "free_text", "resolution"]
 
-    access_contraints = forms.ChoiceField(
-        label=_("LimitationsOnPublicAccess"),
-        required=False
-    )
+    access_contraints = forms.ChoiceField(label=_("LimitationsOnPublicAccess"), required=False)
 
-    use_constraints = forms.ChoiceField(
-        label=_("ConditionsApplyingToAccessAndUse choices"), required=False
-    )
+    use_constraints = forms.ChoiceField(label=_("ConditionsApplyingToAccessAndUse choices"), required=False)
 
     free_text = forms.CharField(
         label=_("ConditionsApplyingToAccessAndUse free text"),
@@ -43,8 +37,8 @@ class LayerRNDTForm(forms.Form):
         lang = get_language()
 
         # getting the default choices from the thesaurus
-        choices_usability = self._get_thesauro_keyword_label('ConditionsApplyingToAccessAndUse', lang)
-        choices_contraints = self._get_thesauro_keyword_label('LimitationsOnPublicAccess', lang)
+        choices_usability = self._get_thesauro_keyword_label("ConditionsApplyingToAccessAndUse", lang)
+        choices_contraints = self._get_thesauro_keyword_label("LimitationsOnPublicAccess", lang)
         # adding custom choices in order to let the free-text textarea appear when selected
         default_choices = [
             ("", "---------"),
@@ -53,10 +47,7 @@ class LayerRNDTForm(forms.Form):
         ]
 
         self.fields["use_constraints"].choices = default_choices
-        self.fields["access_contraints"].choices = [
-            ("", "---------"), 
-            *choices_contraints
-        ]
+        self.fields["access_contraints"].choices = [("", "---------"), *choices_contraints]
 
     @staticmethod
     def _get_thesauro_keyword_label(identifier, lang):
