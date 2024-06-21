@@ -5,7 +5,8 @@ def csw_dispatcher(request, pa_code):
     return csw_global_dispatch(
         request,
         layer_filter=LayerFilters(pa_code).filter_layers,
-        config_updater=RndtCswConfigurer(pa_code).config_updater)
+        config_updater=RndtCswConfigurer(pa_code).config_updater,
+    )
 
 
 class LayerFilters:
@@ -21,6 +22,6 @@ class RndtCswConfigurer:
         self.pa_code = pa_code
 
     def config_updater(self, d: dict) -> dict:
-        old_url = d['server']['url']
-        d['server']['url'] = f'{old_url}/{self.pa_code}'
+        old_url = d["server"]["url"]
+        d["server"]["url"] = f"{old_url}/{self.pa_code}"
         return d

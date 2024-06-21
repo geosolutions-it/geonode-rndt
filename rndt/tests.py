@@ -24,18 +24,14 @@ class TestUUIDHandlerTestCase(unittest.TestCase):
         self.assertEqual("ipa:123abc456", actual)
 
     @patch("uuid.uuid1")
-    def test_return_the_instance_uuid_with_the_ipa_code_if_the_uuid_is_not_present(
-        self, mocked_uuid
-    ):
+    def test_return_the_instance_uuid_with_the_ipa_code_if_the_uuid_is_not_present(self, mocked_uuid):
         mocked_uuid.return_value = "123abc456"
         self.sut.uuid = ""
         actual = UUIDHandler(self.sut).create_uuid()
         self.assertEqual("c_123:123abc456", actual)
 
     @patch("uuid.uuid1")
-    def test_return_the_instance_uuid_if_the_uuid_and_ipa_are_not_present(
-        self, mocked_uuid
-    ):
+    def test_return_the_instance_uuid_if_the_uuid_and_ipa_are_not_present(self, mocked_uuid):
         mocked_uuid.return_value = "123abc456"
         self.sut.uuid = ""
         self.sut.group = None

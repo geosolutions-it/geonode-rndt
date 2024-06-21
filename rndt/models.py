@@ -2,7 +2,6 @@ from django.db import models
 from django.db.models import signals
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from geonode.base.models import Link 
 from geonode.groups.models import GroupProfile
 from geonode.layers.models import Dataset, ResourceBase
 from geonode.resource.utils import resourcebase_post_save
@@ -31,7 +30,7 @@ class PubblicaAmministrazione(models.Model):
         self.ipa_has_changed = self._has_changed()
         self._rb_to_update = (None, None)
         if self.ipa_has_changed:
-            self._rb_to_update = (self.ipa,  self.__previous_ipa if self.__previous_ipa else None)
+            self._rb_to_update = (self.ipa, self.__previous_ipa if self.__previous_ipa else None)
         super(PubblicaAmministrazione, self).save(*args, **kwargs)
 
     def _has_changed(self):
@@ -45,16 +44,14 @@ class PubblicaAmministrazione(models.Model):
 
 class GroupProfileRNDT(models.Model):
     group_profile = models.OneToOneField(GroupProfile, on_delete=models.CASCADE)
-    pa = models.ForeignKey(
-        "PubblicaAmministrazione", related_name="pa", on_delete=models.CASCADE
-    )
+    pa = models.ForeignKey("PubblicaAmministrazione", related_name="pa", on_delete=models.CASCADE)
     __previous_pa = None
 
     def __init__(self, *args, **kwargs):
         super(GroupProfileRNDT, self).__init__(*args, **kwargs)
         try:
             self.__previous_pa = self.pa
-        except:
+        except Exception:
             pass
 
     def __str__(self):
@@ -104,9 +101,7 @@ def _pa_post_save(sender, instance, raw, **kwargs):
 
 def replace_uuid(resources, current_ipa, ipa_to_replace):
     for resource in resources:
-        resource.uuid = UUIDHandler.replace_uuid(
-            current_ipa, ipa_to_replace, resource.uuid
-        )
+        resource.uuid = UUIDHandler.replace_uuid(current_ipa, ipa_to_replace, resource.uuid)
         resource.save()
 
     r_updated = ",".join([str(r.id) for r in resources])

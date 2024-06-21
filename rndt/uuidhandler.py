@@ -55,18 +55,16 @@ class UUIDHandler:
 
     @staticmethod
     def extract_ipa_from_uuid(instance_uuid):
-        pattern = re.compile("^\W*(\w+)\W*:")
+        pattern = re.compile(r"^\W*(\w+)\W*:")
         match = re.findall(pattern, instance_uuid)
         return match[0] if match else False
 
     @staticmethod
     def extract_uuid(instance_uuid):
-        pattern = re.compile(":\W*(\w+)\W*$")
+        pattern = re.compile(r":\W*(\w+)\W*$")
         match = re.findall(pattern, instance_uuid)
         return match[0] if match else False
 
     def delete_old_metadata_links(self):
-        l = Link.objects.filter(link_type="metadata").filter(
-            resource__id=self.instance.id
-        )
-        l.delete()
+        link = Link.objects.filter(link_type="metadata").filter(resource__id=self.instance.id)
+        link.delete()
