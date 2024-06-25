@@ -35,13 +35,14 @@ def rndt_parser(xml, uuid="", vals={}, regions=[], keywords=[], custom={}):
     rndt_parser.get_use_costraints(vals, use_constr)
     rndt_parser.get_resolutions(custom)
     rndt_parser.get_accuracy(custom)
+    rndt_parser.get_freq(vals)
 
     return uuid, vals, regions, keywords, custom
 
 
 class RNDTMetadataParser:
     """
-    RNDTParser, parser complain for parse the RNDT specification
+    A metadata parser compliant with the RNDT specification
     """
 
     def __init__(self, exml):
@@ -54,9 +55,20 @@ class RNDTMetadataParser:
             )
         )
 
+    def get_freq(self, vals):
+        freq_elem = self.exml.find(
+            util.nspath_eval(
+                "gmd:identificationInfo/gmd:MD_DataIdentification/gmd:resourceMaintenance/gmd:MD_MaintenanceInformation/gmd:maintenanceAndUpdateFrequency/gmd:MD_MaintenanceFrequencyCode",
+                self.namespaces,
+            )
+        )
+
+        freq = freq_elem.attrib.get("codeListValue", None) if freq_elem is not None else None
+        vals["maintenance_frequency"] = freq or "unknown"
+
     def get_access_costraints(self, custom):
         """
-        Function responsible to get the access constraints complained with RNDT
+        Function responsible to get the access constraints compliant with RNDT
         - will take all the instances of LegalConstraints
           - if the restriction MD_RestrictionCode under accessConstraints has a codeListValue = otherRestrictions
             - If is an anchor item,
@@ -98,7 +110,7 @@ class RNDTMetadataParser:
 
     def get_use_costraints(self, vals, acc_constr):
         """
-        Function responsible to get the use constraints complained with RNDT
+        Function responsible to get the use constraints compliant with RNDT
         - will take all the instances of LegalConstraints
           - if the restriction MD_RestrictionCode under useConstraints has a codeListValue = otherRestrictions
             - If is an anchor item,
