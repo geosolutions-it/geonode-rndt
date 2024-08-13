@@ -14,7 +14,8 @@ class RndtConfig(AppConfig):
 
 
 def run_setup_hooks(*args, **kwargs):
-    from django.conf.urls import include, url
+    from django.conf.urls import include
+    from django.urls import re_path
     from geonode.urls import urlpatterns
 
     LOCAL_ROOT = os.path.abspath(os.path.dirname(__file__))
@@ -29,9 +30,9 @@ def run_setup_hooks(*args, **kwargs):
     else:
         setattr(settings, "ADVANCED_EDIT_EXCLUDE_FIELD", rndt_exclude_fields)
 
-    rdt_parsers = ["__DEFAULT__", "rndt.layers.metadata.rndt_parser"]
+    rndt_parsers = ["__DEFAULT__", "rndt.layers.metadata.rndt_parser"]
     if not getattr(settings, "METADATA_PARSERS", None):
-        setattr(settings, "METADATA_PARSERS", rdt_parsers)
+        setattr(settings, "METADATA_PARSERS", rndt_parsers)
     elif "rndt.layers.metadata.rndt_parser" not in settings.METADATA_PARSERS:
         settings.METADATA_PARSERS.extend(["rndt.layers.metadata.rndt_parser"])
         setattr(settings, "METADATA_PARSERS", settings.METADATA_PARSERS)
@@ -51,7 +52,7 @@ def run_setup_hooks(*args, **kwargs):
         setattr(settings, "UI_DEFAULT_MANDATORY_FIELDS", settings.UI_DEFAULT_MANDATORY_FIELDS)
 
     urlpatterns += [
-        url(r"^", include("rndt.api.urls")),
-        url(r"^catalogue/", include("rndt.catalogue.urls")),
-        url(r"^datasets/", include("rndt.layers.urls")),
+        re_path(r"^", include("rndt.api.urls")),
+        re_path(r"^catalogue/", include("rndt.catalogue.urls")),
+        re_path(r"^datasets/", include("rndt.layers.urls")),
     ]
