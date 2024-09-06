@@ -303,8 +303,8 @@
             <gmd:MD_MaintenanceInformation>
                <gmd:maintenanceAndUpdateFrequency>
                   <gmd:MD_MaintenanceFrequencyCode 
-                     codeListValue="{{ layer.maintenance_frequency or 'unknown' }}"
-                     codeList="http://standards.iso.org/ittf/PubliclyAvailableStandards/ISO_19139_Schemas/resources/Codelist/ML_gmxCodelists.xml#MD_MaintenanceFrequencyCode">{{ layer.maintenance_frequency or 'unknown'}}</gmd:MD_MaintenanceFrequencyCode>
+                     codeListValue="{{ layer.maintenance_frequency|default:'unknown' }}"
+                     codeList="http://standards.iso.org/ittf/PubliclyAvailableStandards/ISO_19139_Schemas/resources/Codelist/ML_gmxCodelists.xml#MD_MaintenanceFrequencyCode">{{ layer.maintenance_frequency|default:'unknown'}}</gmd:MD_MaintenanceFrequencyCode>
                </gmd:maintenanceAndUpdateFrequency>
             </gmd:MD_MaintenanceInformation>
          </gmd:resourceMaintenance>
