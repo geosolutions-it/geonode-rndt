@@ -504,7 +504,7 @@
   </gmd:identificationInfo>
 
    <gmd:contentInfo>
-      {% if layer.storeType == 'coverageStore' %}
+      {% if layer.subtype == 'raster' %}
       <gmd:MD_CoverageDescription>
          <gmd:attributeDescription gco:nilReason="inapplicable"/>
          <gmd:contentType>
@@ -513,7 +513,7 @@
                codeListValue="image">image</gmd:MD_CoverageContentTypeCode>
          </gmd:contentType>
       </gmd:MD_CoverageDescription>
-      {% elif layer.storeType == 'dataStore' %}
+      {% elif layer.subtype == 'vector' %}
       <gmd:MD_FeatureCatalogueDescription>
          <gmd:includedWithDataset>
             <gco:Boolean>0</gco:Boolean>
@@ -529,11 +529,11 @@
       <gmd:MD_Distribution>
          <gmd:distributionFormat>
             <gmd:MD_Format>
-               {% if layer.storeType == 'coverageStore' %}               
+               {% if layer.subtype == 'raster' %}               
                <gmd:name>  
                   <gco:CharacterString>GeoTIFF</gco:CharacterString>
                </gmd:name>
-               {% elif layer.storeType == 'dataStore' %}
+               {% elif layer.subtype == 'vector' %}
                <gmd:name>  
                   <gco:CharacterString>ESRI ShapeFile</gco:CharacterString>
                </gmd:name>
