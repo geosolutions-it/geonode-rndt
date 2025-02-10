@@ -8,9 +8,11 @@ def rndt_storer(dataset, custom):
     if rndt_dict is not None:
         rndt, created = LayerRNDT.objects.get_or_create(
             layer=dataset,
-            constraints_other=rndt_dict.get("constraints_other", None),
-            resolution=rndt_dict.get("resolution", None),
-            accuracy=rndt_dict.get("accuracy", None),
+            defaults= {
+                "constraints_other": rndt_dict.get("constraints_other", None),
+                "resolution": rndt_dict.get("resolution", None),
+                "accuracy": rndt_dict.get("accuracy", None),
+            }
         )
 
         if not created:
