@@ -30,7 +30,7 @@
    </gmd:hierarchyLevel>
 
    {# 2.2.5 Req C.6: responsabile metadati [1..*] #}
-   {% with layer.poc as poc %}
+   {% for poc in layer.poc %}
    <gmd:contact>
       <gmd:CI_ResponsibleParty>
          {# Req C.6: OrganisationName[1] #}
@@ -85,7 +85,7 @@
          </gmd:role>
       </gmd:CI_ResponsibleParty>
    </gmd:contact>
-   {% endwith %}
+   {% endfor %}
 
    <gmd:dateStamp>
       <gco:Date>{{layer.csw_insert_date|date:"Y-m-d"}}</gco:Date>
@@ -231,7 +231,7 @@
 
          <gmd:pointOfContact>
             {# 2.3.7 Punto di contatto #}
-            {% with layer.poc as poc %}
+            {% for poc in layer.poc %}
                <gmd:CI_ResponsibleParty>
                <gmd:organisationName {% if not poc.organization %}gco:nilReason="missing"{% endif %}>
                {% if poc.organization %} <gco:CharacterString>{{ poc.organization }}</gco:CharacterString> {% endif %}
@@ -296,7 +296,7 @@
                   codeListValue="pointOfContact">pointOfContact</gmd:CI_RoleCode>
              </gmd:role>
            </gmd:CI_ResponsibleParty>
-         {% endwith %}
+         {% endfor %}
          </gmd:pointOfContact>
 
          <gmd:resourceMaintenance>
@@ -548,7 +548,7 @@
          <gmd:distributor>
             <gmd:MD_Distributor>
                <gmd:distributorContact>
-               {% with layer.poc as poc %}
+               {% for poc in layer.poc %}
                   <gmd:CI_ResponsibleParty>
                      {# 3.6.2 Req R1.9: Distributore [1..N] #}
                      <gmd:organisationName {% if not poc.organization %}gco:nilReason="missing"{% endif %}>
@@ -601,7 +601,7 @@
                            codeListValue="pointOfContact">pointOfContact</gmd:CI_RoleCode>
                      </gmd:role>
                   </gmd:CI_ResponsibleParty>
-               {% endwith %}
+               {% endfor %}
                </gmd:distributorContact>
             </gmd:MD_Distributor>
          </gmd:distributor>
