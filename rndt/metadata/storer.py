@@ -21,5 +21,5 @@ def rndt_storer(dataset, custom):
             rndt.accuracy = rndt_dict.get("accuracy", None)
             rndt.save()
 
-    catalogue_post_save(dataset, Dataset)
+        catalogue_post_save(dataset, Dataset)
     return dataset

@@ -29,14 +29,18 @@ def run_setup_hooks(*args, **kwargs):
 
     # settings.TEMPLATES[0]["OPTIONS"]["context_processors"].append("rndt.context_processors.rndt_tags")
 
-    rndt_parsers = ["__DEFAULT__", "rndt.layers.metadata.rndt_parser"]
+    RNDT_PARSER_FUNCTION = "rndt.metadata.parser.rndt_parser"
+
+    rndt_parsers = ["__DEFAULT__", RNDT_PARSER_FUNCTION]
     if not getattr(settings, "METADATA_PARSERS", None):
         setattr(settings, "METADATA_PARSERS", rndt_parsers)
-    elif "rndt.layers.metadata.rndt_parser" not in settings.METADATA_PARSERS:
-        settings.METADATA_PARSERS.extend(["rndt.layers.metadata.rndt_parser"])
+    elif RNDT_PARSER_FUNCTION not in settings.METADATA_PARSERS:
+        settings.METADATA_PARSERS.extend([RNDT_PARSER_FUNCTION])
         setattr(settings, "METADATA_PARSERS", settings.METADATA_PARSERS)
 
-    rndt_storers = ["rndt.layers.storer.rndt_storer"]
+    RNDT_STORER_FUNCTION = "rndt.metadata.storer.rndt_storer"
+
+    rndt_storers = [RNDT_STORER_FUNCTION]
     if not getattr(settings, "METADATA_STORERS", None):
         setattr(settings, "METADATA_STORERS", rndt_storers)
     elif rndt_storers[0] not in settings.METADATA_STORERS:
