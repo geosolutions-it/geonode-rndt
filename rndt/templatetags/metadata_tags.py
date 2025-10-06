@@ -1,7 +1,5 @@
 from django import template
-from django.core.validators import URLValidator
 from geonode.base.models import Thesaurus, ThesaurusKeyword, ThesaurusKeywordLabel
-from rndt.models import LayerRNDT
 
 register = template.Library()
 
