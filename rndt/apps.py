@@ -38,15 +38,6 @@ def run_setup_hooks(*args, **kwargs):
         settings.METADATA_PARSERS.extend([RNDT_PARSER_FUNCTION])
         setattr(settings, "METADATA_PARSERS", settings.METADATA_PARSERS)
 
-    RNDT_STORER_FUNCTION = "rndt.metadata.storer.rndt_storer"
-
-    rndt_storers = [RNDT_STORER_FUNCTION]
-    if not getattr(settings, "METADATA_STORERS", None):
-        setattr(settings, "METADATA_STORERS", rndt_storers)
-    elif rndt_storers[0] not in settings.METADATA_STORERS:
-        settings.METADATA_STORERS.extend(rndt_storers)
-        setattr(settings, "METADATA_STORERS", settings.METADATA_STORERS)
-
     urlpatterns += [
         re_path(r"^", include("rndt.api.urls")),
         re_path(r"^catalogue/", include("rndt.catalogue.urls")),

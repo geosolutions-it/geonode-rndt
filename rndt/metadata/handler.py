@@ -90,12 +90,4 @@ def init():
 
     metadata_manager.add_handler("rndt", RNDTSchemaHandler)
 
-    # TODO: register metadata parser
-
-    # TODO: register metadata storer
-
-    # TODO: set metadata template
-
     # TODO: check for mandatory thesauri
-
-    # TODO: reload schema on thesaurus+thesauruskeywords signal
