@@ -20,7 +20,7 @@ class UUIDHandler:
         newuuid = ""
         uuid_ipa = self.extract_ipa_from_uuid(self.instance.uuid)
         if not layer_ipa:
-            newuuid = self.instance.uuid
+            newuuid = self.remove_ipa_from_uuid(self.instance.uuid)            
         elif layer_ipa in self.instance.uuid:
             newuuid = self.instance.uuid
         elif uuid_ipa:
@@ -58,6 +58,11 @@ class UUIDHandler:
         pattern = re.compile(r"^\W*(\w+)\W*:")
         match = re.findall(pattern, instance_uuid)
         return match[0] if match else False
+
+    @staticmethod
+    def remove_ipa_from_uuid(instance_uuid):
+        match = re.search(r":\s*(.*)", instance_uuid)
+        return match.group(1).strip() if match else instance_uuid.strip()        
 
     @staticmethod
     def extract_uuid(instance_uuid):
