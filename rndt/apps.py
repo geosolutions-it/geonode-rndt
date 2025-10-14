@@ -8,9 +8,14 @@ class RndtConfig(AppConfig):
     name = "rndt"
 
     def ready(self):
+        super(RndtConfig, self).ready()
+
         """Finalize setup"""
         run_setup_hooks()
-        super(RndtConfig, self).ready()
+
+        from rndt.metadata.handler import init as metadata_init
+        metadata_init()
+
 
 
 def run_setup_hooks(*args, **kwargs):
@@ -22,37 +27,19 @@ def run_setup_hooks(*args, **kwargs):
 
     settings.TEMPLATES[0]["DIRS"].insert(0, os.path.join(LOCAL_ROOT, "templates"))
 
-    settings.TEMPLATES[0]["OPTIONS"]["context_processors"].append("rndt.context_processors.rndt_tags")
+    # settings.TEMPLATES[0]["OPTIONS"]["context_processors"].append("rndt.context_processors.rndt_tags")
 
-    rndt_exclude_fields = ["constraints_other", "restriction_code_type"]
-    if hasattr(settings, "ADVANCED_EDIT_EXCLUDE_FIELD"):
-        settings.ADVANCED_EDIT_EXCLUDE_FIELD += rndt_exclude_fields
-    else:
-        setattr(settings, "ADVANCED_EDIT_EXCLUDE_FIELD", rndt_exclude_fields)
+    RNDT_PARSER_FUNCTION = "rndt.metadata.parser.rndt_parser"
 
-    rndt_parsers = ["__DEFAULT__", "rndt.layers.metadata.rndt_parser"]
+    rndt_parsers = ["__DEFAULT__", RNDT_PARSER_FUNCTION]
     if not getattr(settings, "METADATA_PARSERS", None):
         setattr(settings, "METADATA_PARSERS", rndt_parsers)
-    elif "rndt.layers.metadata.rndt_parser" not in settings.METADATA_PARSERS:
-        settings.METADATA_PARSERS.extend(["rndt.layers.metadata.rndt_parser"])
+    elif RNDT_PARSER_FUNCTION not in settings.METADATA_PARSERS:
+        settings.METADATA_PARSERS.extend([RNDT_PARSER_FUNCTION])
         setattr(settings, "METADATA_PARSERS", settings.METADATA_PARSERS)
-
-    rndt_storers = ["rndt.layers.storer.rndt_storer"]
-    if not getattr(settings, "METADATA_STORERS", None):
-        setattr(settings, "METADATA_STORERS", rndt_storers)
-    elif rndt_storers[0] not in settings.METADATA_STORERS:
-        settings.METADATA_STORERS.extend(rndt_storers)
-        setattr(settings, "METADATA_STORERS", settings.METADATA_STORERS)
-
-    rndt_required_fields = ["id_access_contraints", "id_use_constraints", "id_resolution", "id_accuracy"]
-    if not hasattr(settings, "UI_DEFAULT_MANDATORY_FIELDS"):
-        setattr(settings, "UI_DEFAULT_MANDATORY_FIELDS", rndt_required_fields)
-    else:
-        settings.UI_DEFAULT_MANDATORY_FIELDS.extend(rndt_required_fields)
-        setattr(settings, "UI_DEFAULT_MANDATORY_FIELDS", settings.UI_DEFAULT_MANDATORY_FIELDS)
 
     urlpatterns += [
         re_path(r"^", include("rndt.api.urls")),
         re_path(r"^catalogue/", include("rndt.catalogue.urls")),
-        re_path(r"^datasets/", include("rndt.layers.urls")),
+        # re_path(r"^datasets/", include("rndt.layers.urls")),
     ]

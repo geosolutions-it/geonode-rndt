@@ -1,7 +1,5 @@
 from django import template
-from django.core.validators import URLValidator
 from geonode.base.models import Thesaurus, ThesaurusKeyword, ThesaurusKeywordLabel
-from rndt.models import LayerRNDT
 
 register = template.Library()
 
@@ -24,50 +22,13 @@ def rndt_get_localized_tkeyword(tkeyword: ThesaurusKeyword):
 
 
 @register.filter
-def get_access_contraints_url(layer_id):
-    x = LayerRNDT.objects.filter(layer_id=layer_id)
-    if x.exists():
-        return x.get().constraints_other
+def rndt_get_keyword_label_by_about(about):
+    tk = ThesaurusKeyword.objects.filter(about=about).first()
+    if tk:
+        for lang in ("it", "en"):
+            tkl = ThesaurusKeywordLabel.objects.filter(keyword=tk, lang=lang)
+            if tkl.exists():
+                return tkl.first().label
+        return tk.alt_label
     return None
 
-
-@register.filter
-def get_access_contraints_keyword(layer_id):
-    x = LayerRNDT.objects.filter(layer_id=layer_id)
-    if x.exists():
-        url = x.get().constraints_other
-        keyword = ThesaurusKeyword.objects.filter(about=url)
-        if keyword.exists():
-            return ThesaurusKeyword.objects.get(about=url).alt_label
-    return None
-
-
-@register.filter
-def get_use_constraint_keyword(keyword_url):
-    t = ThesaurusKeyword.objects.filter(about=keyword_url)
-    if t.exists():
-        return ThesaurusKeyword.objects.get(about=keyword_url).alt_label
-
-
-@register.filter
-def is_url(item):
-    try:
-        validator = URLValidator()
-        validator(item)
-        return True
-    except Exception:
-        return False
-
-
-@register.filter
-def get_spatial_resolution(layer_id):
-    resolution = LayerRNDT.objects.filter(layer_id=layer_id)
-    if resolution.exists():
-        return LayerRNDT.objects.get(layer_id=layer_id).resolution
-
-
-@register.filter
-def get_positional_accuracy(layer_id):
-    accuracy = LayerRNDT.objects.filter(layer_id=layer_id)
-    if accuracy.exists():
-        return LayerRNDT.objects.get(layer_id=layer_id).accuracy

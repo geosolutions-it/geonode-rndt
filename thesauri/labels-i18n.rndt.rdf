@@ -1,0 +1,62 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<rdf:RDF xmlns="http://www.w3.org/2004/02/skos/core#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:dcterms="http://purl.org/dc/terms/">
+  <ConceptScheme rdf:about="https://i18n.geonode.org">
+    <dc:title>Localizzazione labels</dc:title>
+    <dc:title xml:lang="en">Labels localization</dc:title>
+    <dc:title xml:lang="it">Localizzazione etichette</dc:title>
+    <dcterms:issued>2025-09-22T13:32:53</dcterms:issued>
+    <dcterms:modified>2025-09-22T13:32:53</dcterms:modified>
+  </ConceptScheme>
+  <Concept rdf:about="rndt_ConditionsApplyingToAccessAndUse">
+    <inScheme rdf:resource="https://i18n.geonode.org"/>
+    <altLabel>ConditionsApplyingToAccessAndUse</altLabel>
+    <prefLabel xml:lang="en">Conditions Applying To Access And Use</prefLabel>
+    <prefLabel xml:lang="it">Vincoli di fruibilità</prefLabel>
+  </Concept>
+  <Concept rdf:about="rndt_ConditionsApplyingToAccessAndUse__descr">
+    <inScheme rdf:resource="https://i18n.geonode.org"/>
+    <altLabel>Condizioni applicabili all’accesso e all’uso dei set di dati territoriali e ai relativi servizi</altLabel>
+    <prefLabel xml:lang="it">Condizioni applicabili all’accesso e all’uso dei set di dati territoriali e ai relativi servizi e, dove applicabile, ai canoni corrispondenti, a norma dell'articolo 5, comma 2, lettera b), e dell'articolo 11, comma 2, lettera f), della Direttiva 2007/2/CE</prefLabel>
+  </Concept>
+  <Concept rdf:about="rndt_LimitationsOnPublicAccess">
+    <inScheme rdf:resource="https://i18n.geonode.org"/>
+    <altLabel>LimitationsOnPublicAccess</altLabel>
+    <prefLabel xml:lang="en">Access constraints</prefLabel>
+    <prefLabel xml:lang="it">Vincoli di accesso</prefLabel>
+  </Concept>
+  <Concept rdf:about="rndt_LimitationsOnPublicAccess__descr">
+    <inScheme rdf:resource="https://i18n.geonode.org"/>
+    <altLabel>Vincoli per l’accesso pubblico</altLabel>
+    <prefLabel xml:lang="it">Informazioni sulle limitazioni e le relative motivazioni imposte all’accesso pubblico ai set di dati territoriali e ai servizi a essi relativi a norma dell'articolo 13 della Direttiva 2007/2/CE</prefLabel>
+  </Concept>
+  <Concept rdf:about="rndt_accuracy">
+    <inScheme rdf:resource="https://i18n.geonode.org"/>
+    <altLabel>rndt_accuracy</altLabel>
+    <prefLabel xml:lang="en">Positional Accuracy</prefLabel>
+    <prefLabel xml:lang="it">Accuratezza posizionale</prefLabel>
+  </Concept>
+  <Concept rdf:about="rndt_inspire_url">
+    <inScheme rdf:resource="https://i18n.geonode.org"/>
+    <altLabel>rndt_inspire_url</altLabel>
+    <prefLabel xml:lang="en">Constraints as INSPIRE URL</prefLabel>
+    <prefLabel xml:lang="it">Lista o campo libero</prefLabel>
+  </Concept>
+  <Concept rdf:about="rndt_inspire_url_false">
+    <inScheme rdf:resource="https://i18n.geonode.org"/>
+    <altLabel>rndt_inspire_url_false</altLabel>
+    <prefLabel xml:lang="en">Free text</prefLabel>
+    <prefLabel xml:lang="it">Testo libero</prefLabel>
+  </Concept>
+  <Concept rdf:about="rndt_inspire_url_true">
+    <inScheme rdf:resource="https://i18n.geonode.org"/>
+    <altLabel>rndt_inspire_url_true</altLabel>
+    <prefLabel xml:lang="en">INSPIRE constraints</prefLabel>
+    <prefLabel xml:lang="it">Vincoli INSPIRE</prefLabel>
+  </Concept>
+  <Concept rdf:about="rndt_resolution">
+    <inScheme rdf:resource="https://i18n.geonode.org"/>
+    <altLabel>rndt_resolution</altLabel>
+    <prefLabel xml:lang="en">Resolution</prefLabel>
+    <prefLabel xml:lang="it">Risoluzione</prefLabel>
+  </Concept>
+</rdf:RDF>
