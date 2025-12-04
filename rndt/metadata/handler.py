@@ -2,7 +2,7 @@ import json
 import logging
 import os
 
-from geonode.base.models import ResourceBase, RestrictionCodeType
+from geonode.base.models import ResourceBase
 from geonode.metadata.handlers.abstract import MetadataHandler
 from geonode.metadata.handlers.sparse import sparse_field_registry
 from geonode.metadata.manager import metadata_manager
@@ -22,9 +22,7 @@ class RNDTSchemaHandler(MetadataHandler):
 
     def __init__(self) -> None:
         super().__init__()
-        self.otherRestrictions = RestrictionCodeType.objects.filter(identifier="otherRestrictions").first() or \
-            RestrictionCodeType.objects.filter(description="otherRestrictions").first()
-        # see https://github.com/GeoNode/geonode/issues/12745
+        self.otherRestrictions = None  # lazy init
 
     def update_schema(self, jsonschema, context, lang=None):
 
@@ -67,8 +65,15 @@ class RNDTSchemaHandler(MetadataHandler):
     def pre_save(
         self, resource: ResourceBase, json_instance: dict, context: dict, errors: dict, **kwargs
     ):
-        # RNDT requires restriction_code_type to be otherRestrictions
+        # RNDT requires restriction_code_type to be "otherRestrictions"
+        if not self.otherRestrictions:
+            from geonode.base.models import RestrictionCodeType
+            # see https://github.com/GeoNode/geonode/issues/12745
+            self.otherRestrictions = RestrictionCodeType.objects.filter(identifier="otherRestrictions").first() or \
+                RestrictionCodeType.objects.filter(description="otherRestrictions").first()
+
         resource.restriction_code_type = self.otherRestrictions
+        context.setdefault("base", {})["restriction_code_type"] = self.otherRestrictions
 
         # Setting the ResourceBase field either as URL or freetext
         json_instance.get("rndt_ConditionsApplyingToAccessAndUse", {})
