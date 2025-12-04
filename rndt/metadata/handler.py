@@ -76,7 +76,9 @@ class RNDTSchemaHandler(MetadataHandler):
             val = json_instance.get("url", None)
         else:
             val = json_instance.get("freetext", None)
-        resource.constraints_other = val or "Missing value"
+        val = val or "Missing value"
+        resource.constraints_other = val
+        context.setdefault("base", {})["constraints_other"] = val
 
 def init():
     logger.info("Init RNDTSchema hooks")
