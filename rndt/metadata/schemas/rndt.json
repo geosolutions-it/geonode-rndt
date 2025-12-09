@@ -1,0 +1,73 @@
+{
+  "rndt_LimitationsOnPublicAccess": {
+    "type": "object",
+    "properties": {
+      "id": {"type": "string"},
+      "label": {"type": "string"}
+    },
+    "geonode:handler": "sparse",
+    "geonode:required": true,
+    "geonode:thesaurus": "LimitationsOnPublicAccess",
+    "geonode:after": "data_quality_statement"
+  },
+
+  "rndt_ConditionsApplyingToAccessAndUse": {
+      "type": "object",
+      "properties": {
+        "inspire_url": {
+          "title": "rndt_inspire_url",
+          "type": "boolean",
+          "default": true,
+          "ui:widget": "radio",
+          "oneOf": [
+            {
+              "title": "rndt_inspire_url_true",
+              "const": true
+            },
+            {
+              "title": "rndt_inspire_url_false",
+              "const": false
+            }
+          ]
+        }
+      },
+    "if": {
+      "properties": {
+        "inspire_url": {"const": true}
+      }
+    },
+    "then": {
+      "properties": {
+        "url": {
+          "title": "rndt_inspire_url_true",
+          "type": "string",
+          "geonode:thesaurus-embed": "ConditionsApplyingToAccessAndUse"
+        }
+      }
+    },
+    "else": {
+      "properties": {
+        "freetext": {
+          "title": "rndt_inspire_url_false",
+          "type": "string"
+        }
+      }
+    },
+    "geonode:handler": "sparse",
+    "geonode:required": true,
+    "geonode:after": "rndt_LimitationsOnPublicAccess"
+  },
+
+  "rndt_resolution": {
+    "type": ["number"],
+    "maxLength": 64,
+    "geonode:handler": "sparse",
+    "geonode:required": true
+  },
+  "rndt_accuracy": {
+    "type": ["number"],
+    "maxLength": 64,
+    "geonode:handler": "sparse",
+    "geonode:required": true
+  }
+}

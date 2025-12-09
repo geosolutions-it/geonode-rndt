@@ -1,11 +1,10 @@
-{% load thesaurus %}{% load metadata_tags %}{% load l10n %}
+{% load thesaurus %}
+{% load metadata_tags %}
+{% load l10n %}
 <gmd:MD_Metadata xmlns:gmd="http://www.isotc211.org/2005/gmd"
                  xmlns:gco="http://www.isotc211.org/2005/gco"
                  xmlns:gml="http://www.opengis.net/gml/3.2"
                  xmlns:gmx="http://www.isotc211.org/2005/gmx"
-                 xmlns:gsr="http://www.isotc211.org/2005/gsr"
-                 xmlns:gss="http://www.isotc211.org/2005/gss"
-                 xmlns:gts="http://www.isotc211.org/2005/gts"
                  xmlns:xlink="http://www.w3.org/1999/xlink"
                  xmlns:xs="http://www.w3.org/2001/XMLSchema"
                  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -78,7 +77,7 @@
             </gmd:CI_Contact>
          </gmd:contactInfo>
          <gmd:role>
-            {# Req C.6: role=pointOfContact #}
+            <!-- Req C.6: role=pointOfContact -->
             <gmd:CI_RoleCode 
                codeList="http://standards.iso.org/ittf/PubliclyAvailableStandards/ISO_19139_Schemas/resources/Codelist/ML_gmxCodelists.xml#CI_RoleCode"
                codeListValue="pointOfContact">pointOfContact</gmd:CI_RoleCode>
@@ -408,7 +407,7 @@
                      codeListValue="otherRestrictions">otherRestrictions</gmd:MD_RestrictionCode>
                </gmd:accessConstraints>
                <gmd:otherConstraints>
-                  <gmx:Anchor xlink:href="{{layer.id|get_access_contraints_url}}">{{layer.id|get_access_contraints_keyword}}</gmx:Anchor>
+                  <gmx:Anchor xlink:href="{{metadata.rndt_LimitationsOnPublicAccess.id}}">{{metadata.rndt_LimitationsOnPublicAccess.label}}</gmx:Anchor>
                </gmd:otherConstraints>
             </gmd:MD_LegalConstraints>
          </gmd:resourceConstraints>
@@ -420,10 +419,10 @@
                       codeListValue="otherRestrictions">otherRestrictions</gmd:MD_RestrictionCode>
                </gmd:useConstraints>
                <gmd:otherConstraints>
-               {% if layer.constraints_other|is_url %}
-                  <gmx:Anchor xlink:href="{{layer.constraints_other}}">{{layer.constraints_other|get_use_constraint_keyword}}</gmx:Anchor>
+               {% if metadata.rndt_ConditionsApplyingToAccessAndUse.inspire_url %}
+                  <gmx:Anchor xlink:href="{{metadata.rndt_ConditionsApplyingToAccessAndUse.url}}">{{metadata.rndt_ConditionsApplyingToAccessAndUse.url|rndt_get_keyword_label_by_about}}</gmx:Anchor>
                {% else %}
-                  <gco:CharacterString>{{layer.constraints_other}}</gco:CharacterString>
+                  <gco:CharacterString>{{metadata.rndt_ConditionsApplyingToAccessAndUse.freetext}}</gco:CharacterString>
                {% endif %}
                </gmd:otherConstraints>
             </gmd:MD_LegalConstraints>
@@ -439,7 +438,7 @@
             <gmd:MD_Resolution>
                <gmd:distance>
                   <gco:Distance
-                     uom="http://standards.iso.org/iso/19139/resources/uom/ML_gmxUom.xml#m">{{layer.id|get_spatial_resolution|unlocalize}}</gco:Distance>
+                     uom="http://standards.iso.org/iso/19139/resources/uom/ML_gmxUom.xml#m">{{metadata.rndt_resolution|unlocalize}}</gco:Distance>
                </gmd:distance>
             </gmd:MD_Resolution>
          </gmd:spatialResolution>
@@ -717,7 +716,7 @@
                      </gmd:valueUnit>
                      <gmd:value>
                         <gco:Record> 
-                           <gco:Real>{{layer.id|get_positional_accuracy|unlocalize}}</gco:Real>
+                           <gco:Real>{{metadata.rndt_accuracy|unlocalize}}</gco:Real>
                         </gco:Record>
                      </gmd:value>
                   </gmd:DQ_QuantitativeResult>
@@ -759,9 +758,12 @@
          </gmd:report>
          <gmd:lineage>
             <gmd:LI_Lineage>
-               <gmd:statement {% if not layer.raw_data_quality_statement %}gco:nilReason="missing"/>{% else %}>
+               {% if layer.raw_data_quality_statement %}
+               <gmd:statement>
                   <gco:CharacterString>{{layer.raw_data_quality_statement}}</gco:CharacterString>
                </gmd:statement>
+               {% else %}
+               <gmd:statement gco:nilReason="missing"/>
                {% endif %}
             </gmd:LI_Lineage>
          </gmd:lineage>

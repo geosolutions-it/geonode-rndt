@@ -10,30 +10,29 @@ class UUIDHandler:
         self.instance = instance
 
     def create_uuid(self):
-        layer_ipa = self.get_layer_ipa()
-        return self._generate_uuid(layer_ipa)
+        group_ipa = self.get_group_ipa()
+        return self._generate_uuid(group_ipa)
 
-    def _generate_uuid(self, layer_ipa):
+    def _generate_uuid(self, group_ipa):
         if not self.instance.uuid:
-            return self._uuid_does_not_exists(layer_ipa)
+            return self._create_uuid_from_scratch(group_ipa)
 
-        newuuid = ""
-        uuid_ipa = self.extract_ipa_from_uuid(self.instance.uuid)
-        if not layer_ipa:
+        previous_ipa = self.extract_ipa_from_uuid(self.instance.uuid)
+        if not group_ipa:
+            newuuid = self.remove_ipa_from_uuid(self.instance.uuid)
+        elif group_ipa in self.instance.uuid:
             newuuid = self.instance.uuid
-        elif layer_ipa in self.instance.uuid:
-            newuuid = self.instance.uuid
-        elif uuid_ipa:
-            if layer_ipa == uuid_ipa:
+        elif previous_ipa:
+            if group_ipa == previous_ipa:
                 newuuid = self.instance.uuid
             else:
-                newuuid = self.replace_uuid(layer_ipa, uuid_ipa, self.instance.uuid)
+                newuuid = self.replace_uuid(group_ipa, previous_ipa, self.instance.uuid)
         else:
-            newuuid = f"{layer_ipa}:{self.instance.uuid}"
+            newuuid = f"{group_ipa}:{self.instance.uuid}"
         self.delete_old_metadata_links()
         return newuuid[:36]
 
-    def get_layer_ipa(self):
+    def get_group_ipa(self):
         if self.instance.group is not None:
             try:
                 logging.debug("Retrieving ipa if associated")
@@ -43,11 +42,11 @@ class UUIDHandler:
                 pass
         return None
 
-    def _uuid_does_not_exists(self, layer_ipa):
-        if not self.instance.uuid and not layer_ipa:
+    def _create_uuid_from_scratch(self, group_ipa):
+        if not self.instance.uuid and not group_ipa:
             return f"{uuid.uuid1()}"
-        elif not self.instance.uuid and layer_ipa:
-            return f"{layer_ipa}:{uuid.uuid1()}"
+        elif not self.instance.uuid and group_ipa:
+            return f"{group_ipa}:{uuid.uuid1()}"
 
     @staticmethod
     def replace_uuid(new_ipa, old_ipa, str_to_replace):
@@ -58,6 +57,11 @@ class UUIDHandler:
         pattern = re.compile(r"^\W*(\w+)\W*:")
         match = re.findall(pattern, instance_uuid)
         return match[0] if match else False
+
+    @staticmethod
+    def remove_ipa_from_uuid(instance_uuid):
+        match = re.search(r":\s*(.*)", instance_uuid)
+        return match.group(1).strip() if match else instance_uuid.strip()
 
     @staticmethod
     def extract_uuid(instance_uuid):
