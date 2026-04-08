@@ -14,7 +14,7 @@ Detailed information on the definition of RNDT are available at this [link](http
 
        pip install -e git+https://github.com/geosolutions-it/geonode-rndt@master#egg=rndt
 
-1. Add "rndt" to your INSTALLED_APPS setting like this::
+1. Add "rndt" to your `INSTALLED_APPS setting` like this::
 
        INSTALLED_APPS = [
           'rndt',
@@ -26,7 +26,11 @@ Detailed information on the definition of RNDT are available at this [link](http
        INSTALLED_APPS += ('rndt',)
 
 
-1. Run ``python manage.py migrate`` to create the RNDT models.
+1. Run ``python manage.py migrate`` to migrate pre-5.0 RNDT models into SparseFields.  
+   If you are installing this app for the first time in GeoNode >= 5.0, you can skip the real migrations
+   and apply fake migrations with the following command:
+
+       python manage.py migrate --fake rndt
 
 1. To enable the `UUIDHandler`, add the following line in the `geonode.settings.py` file:
 
@@ -40,21 +44,22 @@ Detailed information on the definition of RNDT are available at this [link](http
 
        CATALOG_METADATA_XSL = '/static/rndt/rndt-metadata.xsl'
 
-
-## Tests
-
-In order to run tests (NOTE: must be in geonode venv), run ``python -m unittest -v`` to create the RNDT models.
+1. Load thesauri
+Load the needed thesauri, either from the Thesaurus admin page or using the [`thesaurus load` command](https://docs.geonode.org/en/5.0.x/admin/thesaurus/index.html#importing-a-thesaurus-thesaurus-load).  
+You can find them in the [`rndt/thesauri/`](https://github.com/geosolutions-it/geonode-rndt/tree/main/rndt/thesauri) directory.
+- INSPIRE/RNDT thesauri 
+  - `3-2-4-1_gemet-inspire-themes.rdf`
+  - `3-2-4-2_PriorityDataset.rdf`
+  - `3-2-4-3_SpatialScope.rdf`
+  - `3-2-4-5_rndt-all1-fixed.rdf` ("Registro dei dati di interesse generale per il RNDT")
+  - `4-1-2-1_SpatialDataServiceCategory_RNDT-fixed.rdf`
+- Codelists for INSPIRE/RNDT metadata fields:
+  - `ConditionsApplyingToAccessAndUse.rdf`
+  - `LimitationsOnPublicAccess.rdf`
+- Localization entries for the RNDT custom metadata fields:
+  - `labels-i18n.rndt.rdf` 
 
 ## Uninstalling
 
-To uninstall the app, remove all the `rndt` functionalities (`INSTALLED_APPS` and `context_processors`) from  `geonode.settings.py` and restart the server. 
+To uninstall the app, remove all the `rndt` functionalities (`INSTALLED_APPS` and `context_processors`) from  `settings.py` and restart the server. 
 If needed made an hard refresh to let the browser reload the js/css/html files (windows: CTRL+ SHIFT+R | Mac: CMD+SHIFT+R)
-
-
-## Other config
-
-Some custom environment variables are avaiable:
-
-- `DISABLE_LAYER_CONSTRAINTS` (default `true`)  
-
-  If `true` will hide from the Layers Metadata edit wizard page, the contraints in the tab `Location and Licenses`
