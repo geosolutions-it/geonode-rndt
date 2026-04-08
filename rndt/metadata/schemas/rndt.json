@@ -70,5 +70,5 @@
     "geonode:handler": "sparse",
     "geonode:required": true
   }
+  
 }
-
