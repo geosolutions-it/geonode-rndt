@@ -8,13 +8,11 @@
     "geonode:handler": "sparse",
     "geonode:required": true,
     "geonode:thesaurus": "LimitationsOnPublicAccess",
-    "geonode:after": "data_quality_statement",
-    "title": "RNDT: Limitations on public access"
+    "geonode:after": "data_quality_statement"
   },
 
   "rndt_ConditionsApplyingToAccessAndUse": {
       "type": "object",
-      "title": "RNDT: Conditions applying to access and use",
       "properties": {
         "inspire_url": {
           "title": "rndt_inspire_url",
@@ -62,14 +60,12 @@
 
   "rndt_resolution": {
     "type": ["number"],
-    "title": "RNDT: Resolution",
     "maxLength": 64,
     "geonode:handler": "sparse",
     "geonode:required": true
   },
   "rndt_accuracy": {
     "type": ["number"],
-    "title": "RNDT: Accuracy",
     "maxLength": 64,
     "geonode:handler": "sparse",
     "geonode:required": true
