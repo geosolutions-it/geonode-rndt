@@ -42,7 +42,16 @@ class RNDTSchemaHandler(MetadataHandler):
 
             self._add_subschema(jsonschema, property_name, subschema)
 
-        # rndt_required_fields = ["id_access_contraints", "id_use_constraints", "id_resolution", "id_accuracy"]
+        # mandatory fields
+        for prop in (
+            "data_quality_statement",
+        ):
+            jsonschema["properties"][prop].update(
+                {
+                    "type": "string",  # exclude null
+                    "geonode:required": True,
+                }
+            )
 
         # === remove unused fields
         exclude_fields = ["constraints_other", "restriction_code_type"]
