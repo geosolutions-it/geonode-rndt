@@ -95,7 +95,7 @@ class RNDTSchemaHandler(MetadataHandler):
         context.setdefault("base", {})["constraints_other"] = val
 
 def init():
-    logger.info("Init RNDTSchema hooks")
+    logger.info("Init RNDT schema hooks")
 
     # == Add json schema
 
