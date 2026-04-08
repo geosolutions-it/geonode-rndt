@@ -20,7 +20,7 @@ class RndtConfig(AppConfig):
 
 def run_setup_hooks(*args, **kwargs):
     from django.conf.urls import include
-    from django.urls import re_path
+    from django.urls import path
     from geonode.urls import urlpatterns
 
     LOCAL_ROOT = os.path.abspath(os.path.dirname(__file__))
@@ -39,7 +39,7 @@ def run_setup_hooks(*args, **kwargs):
         setattr(settings, "METADATA_PARSERS", settings.METADATA_PARSERS)
 
     urlpatterns += [
-        re_path(r"^", include("rndt.api.urls")),
-        re_path(r"^catalogue/", include("rndt.catalogue.urls")),
-        # re_path(r"^datasets/", include("rndt.layers.urls")),
+        path(r"^", include("rndt.api.urls")),
+        path(r"^catalogue/", include("rndt.catalogue.urls")),
+        # path(r"^datasets/", include("rndt.layers.urls")),
     ]
