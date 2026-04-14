@@ -1,7 +1,9 @@
 from django.conf.urls import include
 from django.urls import re_path
 from geonode.api.urls import api
+
 from rndt.views import PubblicaAmministrazioneResource
+
 
 api.register(PubblicaAmministrazioneResource())
 

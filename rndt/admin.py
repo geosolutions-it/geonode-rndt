@@ -1,5 +1,6 @@
 from django.contrib import admin
-from rndt.models import PubblicaAmministrazione, GroupProfileRNDT
+
+from rndt.models import GroupProfileRNDT, PubblicaAmministrazione
 
 
 @admin.register(PubblicaAmministrazione)

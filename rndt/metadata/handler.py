@@ -7,9 +7,11 @@ from geonode.metadata.handlers.abstract import MetadataHandler
 from geonode.metadata.handlers.sparse import sparse_field_registry
 from geonode.metadata.manager import metadata_manager
 
+
 logger = logging.getLogger(__name__)
 
 CONTEXT_ID = "RNDT"
+
 
 def load_schema_file():
     with open(os.path.join(os.path.dirname(__file__), "schemas", "rndt.json")) as f:
@@ -19,7 +21,6 @@ def load_schema_file():
 
 
 class RNDTSchemaHandler(MetadataHandler):
-
     def __init__(self) -> None:
         super().__init__()
         self.otherRestrictions = None  # lazy init
@@ -43,9 +44,7 @@ class RNDTSchemaHandler(MetadataHandler):
             self._add_subschema(jsonschema, property_name, subschema)
 
         # mandatory fields
-        for prop in (
-            "data_quality_statement",
-        ):
+        for prop in ("data_quality_statement",):
             jsonschema["properties"][prop].update(
                 {
                     "type": "string",  # exclude null
@@ -66,20 +65,19 @@ class RNDTSchemaHandler(MetadataHandler):
     ):
         raise Exception(f"Unhandled field {field_name}")
 
-    def update_resource(
-        self, resource, field_name, json_instance, context, errors, **kwargs
-    ):
+    def update_resource(self, resource, field_name, json_instance, context, errors, **kwargs):
         raise Exception(f"Unhandled field {field_name}")
 
-    def pre_save(
-        self, resource: ResourceBase, json_instance: dict, context: dict, errors: dict, **kwargs
-    ):
+    def pre_save(self, resource: ResourceBase, json_instance: dict, context: dict, errors: dict, **kwargs):
         # RNDT requires restriction_code_type to be "otherRestrictions"
         if not self.otherRestrictions:
             from geonode.base.models import RestrictionCodeType
+
             # see https://github.com/GeoNode/geonode/issues/12745
-            self.otherRestrictions = RestrictionCodeType.objects.filter(identifier="otherRestrictions").first() or \
-                RestrictionCodeType.objects.filter(description="otherRestrictions").first()
+            self.otherRestrictions = (
+                RestrictionCodeType.objects.filter(identifier="otherRestrictions").first()
+                or RestrictionCodeType.objects.filter(description="otherRestrictions").first()
+            )
 
         resource.restriction_code_type = self.otherRestrictions
         context.setdefault("base", {})["restriction_code_type"] = self.otherRestrictions
@@ -93,6 +91,7 @@ class RNDTSchemaHandler(MetadataHandler):
         val = val or "Missing value"
         resource.constraints_other = val
         context.setdefault("base", {})["constraints_other"] = val
+
 
 def init():
     logger.info("Init RNDT schema hooks")

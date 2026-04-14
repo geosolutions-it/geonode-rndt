@@ -10,6 +10,7 @@ from geonode.layers.metadata import convert_keyword, get_tagname
 from owslib import util
 from owslib.iso import get_namespaces
 
+
 logger = logging.getLogger(__name__)
 
 
@@ -40,10 +41,10 @@ def rndt_parser(xml, uuid="", vals={}, regions=[], keywords=[], custom={}):
 
 
 class RNDTMetadataResolver:
-    def __init__(self, jsoninstance:dict):
+    def __init__(self, jsoninstance: dict):
         self.jsoninstance = jsoninstance
 
-    def resolve_constraints(self, constraints:list):
+    def resolve_constraints(self, constraints: list):
         freetext = ""
         access = None
         use = None
@@ -67,18 +68,22 @@ class RNDTMetadataResolver:
             # rndt_LimitationsOnPublicAccess -> url
             # rndt_ConditionsApplyingToAccessAndUse -> text or url
 
-            t = ThesaurusKeyword.objects.filter(about=href).filter(
-                thesaurus__identifier="LimitationsOnPublicAccess"
-            ).first()
+            t = (
+                ThesaurusKeyword.objects.filter(about=href)
+                .filter(thesaurus__identifier="LimitationsOnPublicAccess")
+                .first()
+            )
             if t:
                 if access:
                     logger.warning(f"Duplicate LimitationsOnPublicAccess overridden {access}")
-                access = {"id":href, "label":t.alt_label}
+                access = {"id": href, "label": t.alt_label}
                 continue
 
-            t = ThesaurusKeyword.objects.filter(about=href).filter(
-                thesaurus__identifier="ConditionsApplyingToAccessAndUse"
-            ).first()
+            t = (
+                ThesaurusKeyword.objects.filter(about=href)
+                .filter(thesaurus__identifier="ConditionsApplyingToAccessAndUse")
+                .first()
+            )
             if t:
                 if use:
                     logger.warning(f"Duplicate ConditionsApplyingToAccessAndUse overridden {use}")
@@ -87,7 +92,7 @@ class RNDTMetadataResolver:
 
             logger.warning(f"Skipping unknown URL {constr}")
             # we may try and parse license URLs: that's beyond RNDT requirements, but it would be nice
-        #endfor
+        # endfor
 
         if access:
             self.jsoninstance["rndt_LimitationsOnPublicAccess"] = access
@@ -101,7 +106,8 @@ class RNDTMetadataResolver:
         else:
             if freetext:
                 self.jsoninstance["rndt_ConditionsApplyingToAccessAndUse"] = {
-                    "inspire_url": False, "freetext": freetext
+                    "inspire_url": False,
+                    "freetext": freetext,
                 }
             else:
                 logger.info("ConditionsApplyingToAccessAndUse not found")
@@ -131,8 +137,13 @@ class RNDTMetadataParser:
         )
 
     def parse_codelist(self, xpath):
-        """ This should be moved into the base parser """
-        elem = self.exml.find(util.nspath_eval(xpath, self.namespaces,))
+        """This should be moved into the base parser"""
+        elem = self.exml.find(
+            util.nspath_eval(
+                xpath,
+                self.namespaces,
+            )
+        )
         return (elem.attrib.get("codeListValue", None), elem.text) if elem is not None else None
 
     def parse_constraints(self) -> list:
@@ -177,8 +188,8 @@ class RNDTMetadataParser:
                 constr["text"] = anchor.text
             else:
                 charstring = node.find(
-                        util.nspath_eval("gmd:otherConstraints/gco:CharacterString", self.namespaces)
-                    ).text
+                    util.nspath_eval("gmd:otherConstraints/gco:CharacterString", self.namespaces)
+                ).text
                 constr["href"] = None
                 constr["text"] = charstring
 
@@ -195,7 +206,7 @@ class RNDTMetadataParser:
         )
 
         if resolution is None:
-            logger.info(f"Resolution not found")
+            logger.info("Resolution not found")
             return default
         if isinstance(resolution, (float, int)):
             return resolution
@@ -220,7 +231,7 @@ class RNDTMetadataParser:
         )
 
         if acc is None:
-            logger.info(f"Accuracy not found")
+            logger.info("Accuracy not found")
             return default
         if isinstance(acc, (float, int)):
             return float(acc)
@@ -235,7 +246,6 @@ class RNDTMetadataParser:
 
         logger.warning(f"Accuracy cannot be parsed: [{acc}]")
         return default
-
 
     def resolve_keywords(self):
         """
@@ -335,12 +345,14 @@ class RNDTMetadataParser:
         return available, not_tkey, discarded
 
     def parse_frequency(self):
-        """ This should be moved into the base parser """
-        return self.parse_codelist("gmd:identificationInfo/gmd:MD_DataIdentification/gmd:resourceMaintenance/gmd:MD_MaintenanceInformation/gmd:maintenanceAndUpdateFrequency/gmd:MD_MaintenanceFrequencyCode")
+        """This should be moved into the base parser"""
+        return self.parse_codelist(
+            "gmd:identificationInfo/gmd:MD_DataIdentification/gmd:resourceMaintenance/gmd:MD_MaintenanceInformation/gmd:maintenanceAndUpdateFrequency/gmd:MD_MaintenanceFrequencyCode"
+        )
 
     def get_freq(self, vals):
         freq = self.parse_frequency()
         code = freq[0] if freq else None
         if freq is None:
-            logger.info(f"Frequency not found")
+            logger.info("Frequency not found")
         vals["maintenance_frequency"] = code or "unknown"

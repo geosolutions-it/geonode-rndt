@@ -14,8 +14,8 @@ class RndtConfig(AppConfig):
         run_setup_hooks()
 
         from rndt.metadata.handler import init as metadata_init
-        metadata_init()
 
+        metadata_init()
 
 
 def run_setup_hooks(*args, **kwargs):

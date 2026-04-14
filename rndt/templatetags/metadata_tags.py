@@ -1,6 +1,7 @@
 from django import template
 from geonode.base.models import Thesaurus, ThesaurusKeyword, ThesaurusKeywordLabel
 
+
 register = template.Library()
 
 
@@ -31,4 +32,3 @@ def rndt_get_keyword_label_by_about(about):
                 return tkl.first().label
         return tk.alt_label
     return None
-

@@ -1,7 +1,8 @@
-from collections import namedtuple
-from rndt.uuidhandler import UUIDHandler
-from unittest.mock import patch
 import unittest
+from collections import namedtuple
+from unittest.mock import patch
+
+from rndt.uuidhandler import UUIDHandler
 
 
 class TestUUIDHandlerTestCase(unittest.TestCase):
