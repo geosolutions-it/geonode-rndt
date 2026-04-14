@@ -19,10 +19,7 @@ Detailed information on the definition of RNDT are available at this [link](http
 
 1. Edit your `settings.py` file and add "rndt" to your `INSTALLED_APPS`, like this:
 
-       INSTALLED_APPS = [
-          'rndt',
-          ...
-       ]  
+       INSTALLED_APPS += ('rndt',)
 
 1. Run migrations
 
@@ -31,7 +28,8 @@ Detailed information on the definition of RNDT are available at this [link](http
       python manage.py migrate
    ```
 
-   In case you are running GeoNode within Docker, you need to run the `migrate` command from a shell within the container.
+   In case you are running GeoNode within Docker, you need to run the `migrate` command from a shell within the container.  
+   If you are running GeoNode via a GeoNode project, the migrations will be automatically run.
 
 1. To enable the `UUIDHandler`, add the following line in the `geonode.settings.py` file:
 
