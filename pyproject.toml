@@ -1,15 +1,50 @@
+[build-system]
+requires = ["setuptools>=61.0", "pip >= 26.0.1", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "geonode-rndt"
+version = "5.0.0.dev0"
+description = "RNDT extension for GeoNode"
+readme = "README.md"
+authors = [
+    {name = "geosolutions-it", email = "info@geosolutionsgroup.com"},
+    {name = "Emanuele Tajariol", email = "emanuele.tajariol@geosolutionsgroup.com"},
+]
+requires-python = ">=3.10"
+classifiers = [
+    "Environment :: Web Environment",
+    "Framework :: Django",
+    "Intended Audience :: Developers",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Topic :: Software Development :: Libraries",
+]
+license-files = ["LICENSE"]
+dynamic = ["dependencies"]
+
+[tool.setuptools.dynamic]
+dependencies = {file = ["requirements.txt"]}
+
+[tool.setuptools]
+packages = {find = {where = ["."], include = ["rndt*"]}}
+# We disable include-package-data to rely strictly on the list below
+include-package-data = false
+
+[tool.setuptools.package-data]
+rndt = [
+    "*.html",
+    "*.js",
+    'locale/*/LC_MESSAGES/*.mo',
+    'metadata/data/*.csv',
+    'metadata/schemas/*.json',
+    'templates/xml/*.xml',
+    'thesauri/*.rdf',
+]
+
 [tool.black]
 line-length = 120
-target-version = ['py37']
-exclude = '''
-/(
-    geonode-rndt/.*/migrations/.*
-  | geonode-rndt/.*/settings.py
-  | management
-  | scripts
-  | docs
-  | static
-  | migrations
-  | node_modules
-)/
-'''
+target-version = ['py310']
+force-exclude = 'rndt/migrations/|node_modules|static'
