@@ -4,7 +4,7 @@ from geonode.catalogue.views import csw_global_dispatch
 def csw_dispatcher(request, pa_code):
     return csw_global_dispatch(
         request,
-        layer_filter=LayerFilters(pa_code).filter_layers,
+        dataset_filter=LayerFilters(pa_code).filter_layers,
         config_updater=RndtCswConfigurer(pa_code).config_updater,
     )
 

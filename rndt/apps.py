@@ -38,8 +38,9 @@ def run_setup_hooks(*args, **kwargs):
         settings.METADATA_PARSERS.extend([RNDT_PARSER_FUNCTION])
         setattr(settings, "METADATA_PARSERS", settings.METADATA_PARSERS)
 
+    from rndt.catalogue.urls import add_rndt_csw_dispatcher
+    add_rndt_csw_dispatcher()
+
     urlpatterns += [
-        path(r"^", include("rndt.api.urls")),
-        path(r"^catalogue/", include("rndt.catalogue.urls")),
-        # path(r"^datasets/", include("rndt.layers.urls")),
+        path("", include("rndt.api.urls")),
     ]
