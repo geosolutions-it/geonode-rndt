@@ -3,7 +3,7 @@ requires = ["setuptools>=61.0", "pip >= 26.0.1", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "geonode-rndt"
+name = "rndt"
 version = "5.0.0.dev0"
 description = "RNDT extension for GeoNode"
 readme = "README.md"
