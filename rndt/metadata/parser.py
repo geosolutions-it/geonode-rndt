@@ -62,7 +62,7 @@ class RNDTMetadataResolver:
                 continue
 
             href = constr["href"]
-            text = constr["text"]
+            text = (constr["text"] or "").strip()
 
             if not href:
                 logger.debug(f"Collecting text from {constr}")

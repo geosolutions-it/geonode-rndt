@@ -74,8 +74,8 @@ class GroupProfileRNDT(models.Model):
         super(GroupProfileRNDT, self).save(*args, **kwargs)
 
     def _has_changed(self):
-        new = self.__previous_pa.id if self.__previous_pa is not None else None
-        return new != self.pa.id
+        previous = None if self._state.adding else self.__previous_pa  # objects.create() passes pa to __init__
+        return (previous.id if previous is not None else None) != self.pa.id
 
     class Meta:
         ordering = ("pa",)
@@ -116,8 +116,13 @@ def uuid_mismatches(resources, ipa):
 
 def update_uuids(resources, ipa):
     """Prefix the resources uuid with ipa, replacing any other iPA prefix"""
+    return save_uuids(uuid_mismatches(resources, ipa))
+
+
+def save_uuids(mismatches):
+    """Save the (resource, new uuid) pairs"""
     updated = []
-    for resource, new_uuid in list(uuid_mismatches(resources, ipa)):
+    for resource, new_uuid in list(mismatches):
         UUIDHandler(resource).delete_old_metadata_links()  # the post_save signals recreate them
         resource.uuid = new_uuid
         resource.save()

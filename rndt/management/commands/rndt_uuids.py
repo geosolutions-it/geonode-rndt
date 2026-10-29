@@ -3,7 +3,7 @@ from django.db.models import Q
 from geonode.base.management.command_utils import setup_logger
 from geonode.layers.models import Dataset
 
-from rndt.models import GroupProfileRNDT, update_uuids, uuid_mismatches
+from rndt.models import GroupProfileRNDT, save_uuids, uuid_mismatches
 
 
 logger = setup_logger()
@@ -38,7 +38,7 @@ class Command(BaseCommand):
             for dataset, new_uuid in mismatches:
                 logger.info(f"Dataset {dataset.id} '{dataset.title}': {dataset.uuid} -> {new_uuid}")
             if mismatches and action == "fix":
-                update_uuids([dataset for dataset, _ in mismatches], ipa)
+                save_uuids(mismatches)  # a missing uuid is generated once: save the logged one
             found += len(mismatches)
 
         if action == "fix":

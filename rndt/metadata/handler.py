@@ -33,7 +33,7 @@ class RNDTSchemaHandler(MetadataHandler):
         self.otherRestrictions = None  # lazy init
 
     def update_schema(self, jsonschema, context, lang=None):
-        # only perform customization on existing base fields; rndt fields are handlerd by the sparsehandler
+        # only perform customization on existing base fields; rndt fields are handled by the sparsehandler
 
         properties = jsonschema["properties"]
 

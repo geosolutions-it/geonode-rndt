@@ -135,6 +135,15 @@ class PaChangeTestCase(unittest.TestCase):
         same.save.assert_not_called()
         self.assertEqual(2, self.delete_links.call_count)
 
+    def test_a_new_group_pa_is_a_change(self):
+        from rndt.models import GroupProfileRNDT, PubblicaAmministrazione
+
+        pa = PubblicaAmministrazione(id=1, ipa="c_9")
+        group_rndt = GroupProfileRNDT(pa=pa)  # as objects.create(pa=pa) does
+        self.assertTrue(group_rndt._has_changed())
+        group_rndt._state.adding = False  # as loaded from the DB
+        self.assertFalse(group_rndt._has_changed())
+
     def test_ipa_change_updates_the_pa_datasets(self):
         from rndt.models import _pa_post_save
 
@@ -214,6 +223,7 @@ class UuidsCommandTestCase(unittest.TestCase):
         self.assertIn("3 dataset uuids fixed", out)
         self.assertEqual(["c_9:abc", "c_9:def", "c_9:ghi"], [d.uuid for d in (self.plain, self.other, self.ok)])
         self.assertRegex(self.missing.uuid, r"^c_9:[0-9a-f-]{32}$")
+        self.assertIn(f"Dataset 4 'No uuid':  -> {self.missing.uuid}", out)  # the logged uuid is the saved one
         for dataset in (self.plain, self.other, self.missing):
             dataset.save.assert_called_once()
         self.ok.save.assert_not_called()
@@ -282,7 +292,7 @@ class RNDTParserTestCase(unittest.TestCase):
         self.assertEqual([], ret)
 
     def test_freetext_constraint(self):
-        other = "<gmd:otherConstraints><gco:CharacterString>free use</gco:CharacterString></gmd:otherConstraints>"
+        other = "<gmd:otherConstraints><gco:CharacterString>\n  free use\n</gco:CharacterString></gmd:otherConstraints>"
         ret = self.parser.rndt_parser(iso(constraint("useConstraints", "otherRestrictions", other)))
         self.assertEqual(
             {"inspire_url": False, "freetext": "free use"},
