@@ -12,6 +12,9 @@ logger = logging.getLogger(__name__)
 
 CONTEXT_ID = "RNDT"
 
+REQUIRED_BASE_FIELDS = ("data_quality_statement",)
+EXCLUDED_BASE_FIELDS = ("constraints_other", "restriction_code_type")
+
 
 def load_schema_file():
     with open(os.path.join(os.path.dirname(__file__), "schemas", "rndt.json")) as f:
@@ -21,42 +24,30 @@ def load_schema_file():
 
 
 class RNDTSchemaHandler(MetadataHandler):
+    """
+    Customizes the base fields: RNDT's own fields are sparse, and are added by the SparseHandler
+    """
+
     def __init__(self) -> None:
         super().__init__()
         self.otherRestrictions = None  # lazy init
 
     def update_schema(self, jsonschema, context, lang=None):
+        # only perform customization on existing base fields; rndt fields are handlerd by the sparsehandler
 
-        schema_file = load_schema_file()
+        properties = jsonschema["properties"]
 
-        # building the full schema using the external file
-        for property_name, subschema in schema_file.items():
-            self._localize_subschema_labels(context, subschema, lang, property_name)
-
-            if "geonode:handler" not in subschema:
-                subschema["geonode:handler"] = "rndt"
-            else:
-                handler = subschema["geonode:handler"]
-                if handler == "sparse":
-                    # fields has already been added to the sparsefield register
-                    continue
-
-            self._add_subschema(jsonschema, property_name, subschema)
-
-        # mandatory fields
-        for prop in ("data_quality_statement",):
-            jsonschema["properties"][prop].update(
+        for prop in REQUIRED_BASE_FIELDS:
+            properties[prop].update(
                 {
                     "type": "string",  # exclude null
                     "geonode:required": True,
                 }
             )
 
-        # === remove unused fields
-        exclude_fields = ["constraints_other", "restriction_code_type"]
-        for field in exclude_fields:
+        for field in EXCLUDED_BASE_FIELDS:
             logger.debug(f"Removing field {field}")
-            del jsonschema["properties"][field]
+            properties.pop(field, None)
 
         return jsonschema
 
@@ -83,11 +74,8 @@ class RNDTSchemaHandler(MetadataHandler):
         context.setdefault("base", {})["restriction_code_type"] = self.otherRestrictions
 
         # Setting the ResourceBase field either as URL or freetext
-        json_instance.get("rndt_ConditionsApplyingToAccessAndUse", {})
-        if json_instance.get("inspire_url", False):
-            val = json_instance.get("url", None)
-        else:
-            val = json_instance.get("freetext", None)
+        conditions = json_instance.get("rndt_ConditionsApplyingToAccessAndUse") or {}
+        val = conditions.get("url") if conditions.get("inspire_url", False) else conditions.get("freetext")
         val = val or "Missing value"
         resource.constraints_other = val
         context.setdefault("base", {})["constraints_other"] = val
@@ -96,13 +84,8 @@ class RNDTSchemaHandler(MetadataHandler):
 def init():
     logger.info("Init RNDT schema hooks")
 
-    # == Add json schema
-
-    # register sparse fields:
     for property_name, subschema in load_schema_file().items():
         if subschema.get("geonode:handler", None) == "sparse":
             sparse_field_registry.register(property_name, subschema)
 
     metadata_manager.add_handler("rndt", RNDTSchemaHandler)
-
-    # TODO: check for mandatory thesauri

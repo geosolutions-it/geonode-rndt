@@ -1,3 +1,5 @@
+import logging
+
 from django.db import models
 from django.db.models import signals
 from django.db.models.signals import post_save
@@ -7,6 +9,9 @@ from geonode.layers.models import Dataset, ResourceBase
 from geonode.resource.utils import resourcebase_post_save
 
 from rndt.uuidhandler import UUIDHandler
+
+
+logger = logging.getLogger(__name__)
 
 
 class PubblicaAmministrazione(models.Model):
@@ -81,31 +86,45 @@ class GroupProfileRNDT(models.Model):
 def _group_post_save(sender, instance, raw, **kwargs):
     # if the pa is changed, all the connected resources will be updated
     # the Ipas are object in this case
-    current_ipa, ipa_to_replace = instance._rb_to_update
-    if instance.ipa_has_changed and ipa_to_replace:
+    if raw:  # loaddata does not call save(), so _rb_to_update is unset
+        return
+    current_ipa, _ = instance._rb_to_update
+    if instance.ipa_has_changed:  # also on the first PA of the group: its datasets get the prefix
         resources = Dataset.objects.filter(group_id=instance.group_profile.group_id)
-        replace_uuid(resources, current_ipa, ipa_to_replace)
-    # updating Links
+        update_uuids(resources, current_ipa)
 
 
 @receiver(post_save, sender=PubblicaAmministrazione)
 def _pa_post_save(sender, instance, raw, **kwargs):
     # if the pa is changed, all the connected resources will be updated
     # the Ipas are object in this case
+    if raw:  # loaddata does not call save(), so _rb_to_update is unset
+        return
     current_ipa, ipa_to_replace = instance._rb_to_update
     if instance.ipa_has_changed and ipa_to_replace:
-        resources = Dataset.objects.filter(uuid__startswith=ipa_to_replace)
-        replace_uuid(resources, current_ipa, ipa_to_replace)
-    # updating Links
+        resources = Dataset.objects.filter(uuid__startswith=f"{ipa_to_replace}:")
+        update_uuids(resources, current_ipa)
 
 
-def replace_uuid(resources, current_ipa, ipa_to_replace):
+def uuid_mismatches(resources, ipa):
+    """Yield (resource, expected uuid) for the resources whose uuid is missing or not prefixed by ipa"""
     for resource in resources:
-        resource.uuid = UUIDHandler.replace_uuid(current_ipa, ipa_to_replace, resource.uuid)
-        resource.save()
+        new_uuid = UUIDHandler(resource).uuid_for_ipa(ipa)
+        if new_uuid != resource.uuid:
+            yield resource, new_uuid
 
-    r_updated = ",".join([str(r.id) for r in resources])
-    print(f"Following resources id has been updated : {r_updated}")
+
+def update_uuids(resources, ipa):
+    """Prefix the resources uuid with ipa, replacing any other iPA prefix"""
+    updated = []
+    for resource, new_uuid in list(uuid_mismatches(resources, ipa)):
+        UUIDHandler(resource).delete_old_metadata_links()  # the post_save signals recreate them
+        resource.uuid = new_uuid
+        resource.save()
+        updated.append(str(resource.id))
+
+    r_updated = ",".join(updated)
+    logger.info(f"UUID updated for resources {r_updated}")
     return r_updated
 
 

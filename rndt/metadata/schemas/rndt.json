@@ -60,13 +60,11 @@
 
   "rndt_resolution": {
     "type": ["number"],
-    "maxLength": 64,
     "geonode:handler": "sparse",
     "geonode:required": true
   },
   "rndt_accuracy": {
     "type": ["number"],
-    "maxLength": 64,
     "geonode:handler": "sparse",
     "geonode:required": true
   }

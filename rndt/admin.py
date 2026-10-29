@@ -41,10 +41,10 @@ class GroupProfileRNDTAdmin(admin.ModelAdmin):
         return obj.group_profile.title
 
     show_pa.short_description = "Ente"
-    show_pa.admin_order_field = "pa.name"
+    show_pa.admin_order_field = "pa__name"
 
     show_ipa.short_description = "iPA"
-    show_ipa.admin_order_field = "pa.ipa"
+    show_ipa.admin_order_field = "pa__ipa"
 
     show_group.short_description = "Group profile"
-    show_group.admin_order_field = "group_profile.title"
+    show_group.admin_order_field = "group_profile__title"
