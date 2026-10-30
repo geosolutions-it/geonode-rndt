@@ -1,4 +1,3 @@
-import ast
 import logging
 
 from defusedxml import ElementTree as dlxml
@@ -14,7 +13,12 @@ from owslib.iso import get_namespaces
 logger = logging.getLogger(__name__)
 
 
-def rndt_parser(xml, uuid="", vals={}, regions=[], keywords=[], custom={}):
+def rndt_parser(xml, uuid="", vals=None, regions=None, keywords=None, custom=None):
+    # the caller may pass along its default args: never edit them in place
+    vals = dict(vals or {})
+    regions = list(regions or [])
+    custom = dict(custom or {})
+
     # check if document is XML
     try:
         exml = dlxml.fromstring(xml.encode())
@@ -31,7 +35,7 @@ def rndt_parser(xml, uuid="", vals={}, regions=[], keywords=[], custom={}):
     custom["rejected_keywords"] = discarded
 
     # Next calls parse and store metadata in a jsonschema compliant way (geonode5)
-    jsoninstance = custom.setdefault("jsoninstance", {})
+    jsoninstance = custom["jsoninstance"] = dict(custom.get("jsoninstance") or {})
     resolver = RNDTMetadataResolver(jsoninstance)
     resolver.resolve_constraints(rndt_parser.parse_constraints())
     resolver.resolve_resolution(rndt_parser.parse_resolution())
@@ -58,11 +62,12 @@ class RNDTMetadataResolver:
                 continue
 
             href = constr["href"]
-            text = constr["text"]
+            text = (constr["text"] or "").strip()
 
             if not href:
                 logger.debug(f"Collecting text from {constr}")
-                freetext = f"{freetext}\n{text} "
+                if text:
+                    freetext = f"{freetext}\n{text}" if freetext else text
                 continue
 
             # rndt_LimitationsOnPublicAccess -> url
@@ -183,15 +188,16 @@ class RNDTMetadataParser:
             constr["code"] = md_restriction_code.attrib.get("codeListValue", "")
 
             anchor = node.find(util.nspath_eval("gmd:otherConstraints/gmx:Anchor", self.namespaces))
+            charstring = node.find(util.nspath_eval("gmd:otherConstraints/gco:CharacterString", self.namespaces))
             if anchor is not None:
                 constr["href"] = anchor.attrib.get("{http://www.w3.org/1999/xlink}href")
                 constr["text"] = anchor.text
-            else:
-                charstring = node.find(
-                    util.nspath_eval("gmd:otherConstraints/gco:CharacterString", self.namespaces)
-                ).text
+            elif charstring is not None:
                 constr["href"] = None
-                constr["text"] = charstring
+                constr["text"] = charstring.text
+            else:
+                logger.debug("Constraint without otherConstraints")
+                continue
 
             ret.append(constr)
 
@@ -208,19 +214,8 @@ class RNDTMetadataParser:
         if resolution is None:
             logger.info("Resolution not found")
             return default
-        if isinstance(resolution, (float, int)):
-            return resolution
 
-        try:
-            res = ast.literal_eval(resolution.text)
-            if isinstance(res, (float, int)):
-                return res
-        except ValueError as e:
-            logger.warning(f"Error parsing resolution '{resolution.text}': {e}")
-            return default
-
-        logger.warning(f"Resolution cannot be parsed: [{resolution}]")
-        return default
+        return self._parse_number(resolution.text, "resolution", default)
 
     def parse_accuracy(self, default=None):
         acc = self.exml.find(
@@ -233,26 +228,22 @@ class RNDTMetadataParser:
         if acc is None:
             logger.info("Accuracy not found")
             return default
-        if isinstance(acc, (float, int)):
-            return float(acc)
 
+        return self._parse_number(acc.text, "accuracy", default)
+
+    @staticmethod
+    def _parse_number(text, what, default=None):
         try:
-            eval_acc = ast.literal_eval(acc.text)
-            if isinstance(eval_acc, (float, int)):
-                return float(eval_acc)
-        except ValueError as e:
-            logger.warning(f"Error parsing resolution '{acc.text}': {e}")
+            return float(text.strip())
+        except (AttributeError, ValueError) as e:
+            logger.warning(f"Error parsing {what} '{text}': {e}")
             return default
-
-        logger.warning(f"Accuracy cannot be parsed: [{acc}]")
-        return default
 
     def resolve_keywords(self):
         """
         Function to resolve keywords.
         By xpaths will resove which keywords will used converted for the keyword Handler object
         """
-        k_not_found = []
         keywords = []
         discarded = []
         for mdkw in self.mdkws:
@@ -265,12 +256,16 @@ class RNDTMetadataParser:
                 )
 
                 thesaurus_info = mdkw.find(util.nspath_eval("gmd:thesaurusName/gmd:CI_Citation", self.namespaces))
-                k_available, k_not_found, discarded = self._get_keywords(all_keys, thesaurus_info)
+                k_available, k_not_found, k_discarded = self._get_keywords(all_keys, thesaurus_info)
+                discarded.extend(k_discarded)
 
                 if len(k_not_found) > 0:
                     keywords.extend(convert_keyword(k_not_found, theme=theme))
 
-                if len(k_available) > 0:
+                if len(k_available) > 0 and thesaurus_info is None:
+                    # an Anchor keyword outside of any thesaurus: keep it as a free keyword
+                    keywords.extend(convert_keyword(k_available, theme=theme))
+                elif len(k_available) > 0:
                     date = util.testXMLValue(
                         thesaurus_info.find(
                             util.nspath_eval(
@@ -338,7 +333,7 @@ class RNDTMetadataParser:
                     available.append(k.first().alt_label)
                 else:
                     discarded.append(text)
-            elif thesaurus_info:
+            elif thesaurus_info is not None:
                 available.append(text)
             else:
                 not_tkey.append(text)

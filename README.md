@@ -43,43 +43,56 @@ Detailed information on the definition of RNDT are available at this [link](http
 
        CATALOG_METADATA_XSL = '/static/rndt/rndt-metadata.xsl'
 
-1. Load and configure thesauri  
-   Load the needed thesauri, either from the Thesaurus admin page or using the [`thesaurus load` command](https://docs.geonode.org/en/5.0.x/admin/thesaurus/index.html#importing-a-thesaurus-thesaurus-load).  
-   You can find them in the [`rndt/thesauri/`](https://github.com/geosolutions-it/geonode-rndt/tree/main/rndt/thesauri) directory.
+1. Optionally, also publish via CSW the services of the [csw_services](https://github.com/geosolutions-it/geonode-csw-services) app:
+   CSW searches only return the resource types in the GeoNode `PYCSW["FILTER"]` (by default, datasets only):
 
-   Once loaded, [configure the thesauri](https://docs.geonode.org/en/5.0.x/admin/thesaurus/index.html#configuring-a-thesaurus):  
+       PYCSW["FILTER"] = {"resource_type__in": ["dataset", "cswservice"]}
 
-   - INSPIRE/RNDT thesauri  
-     These thesauri are used as controlled vocabularies, so
-     - the *max* cardinality should be set different than 0 (where -1 means unlimited elements)
-     - *order* is the sort order they appear in the metadata editor
-     - *facet* tells if the thesaurus should also appear as a dropdown filter in the resources page
-   
-     | File   | min | max | order | facet | Title |
-     |--------|-----|-----|-------|-------|-------|
-     | `3-2-4-1_gemet-inspire-themes.rdf` | 1 | -1 | 10 | Yes | Categorie tematiche INSPIRE |
-     | `3-2-4-2_PriorityDataset.rdf`      | 0 | -1 | 20 | Yes | Dataset prioritari |
-     | `3-2-4-3_SpatialScope.rdf`         | 0 | -1 | 30 | Yes | Ambito di applicazione territoriale | 
-     | `3-2-4-5_rndt-all1-fixed.rdf`      | 0 | -1 | 40 | Yes | Registro dei dati di interesse generale per il RNDT |
+1. Configure the thesauri  
+   The thesauri in `rndt/thesauri/` are loaded by `python manage.py thesaurus autoload`, which the GeoNode Docker
+   entrypoint runs at every start. They are created hidden from the metadata editor (max=0); to show the INSPIRE/RNDT
+   vocabularies, set them in the Thesaurus admin page (reloading keeps these settings):
 
-   - Codelists for INSPIRE/RNDT metadata fields  
-     These thesauri are used internally as codelists, so they should not appear in the thesauri list in the metadata editor (so max=0).
-     What's important here is to double check the `identifier` value, because that's how these thesauri are referenced internally.
-   
-     | File   | max | Identifier |
-     |--------|-----|------------|
-     | `ConditionsApplyingToAccessAndUse.rdf` | 0 | `ConditionsApplyingToAccessAndUse` | 
-     | `LimitationsOnPublicAccess.rdf`        | 0 | `LimitationsOnPublicAccess` |
-     
-   - Localization entries for the RNDT custom metadata fields:
-     As per the codelists, this should not appear in the metadata editor, and its identifier is important:
+   | Identifier                     | min | max | order | facet |
+   |--------------------------------|-----|-----|-------|-------|
+   | `3-2-4-1_gemet-inspire-themes` | 1   | -1  | 10    | Yes   |
+   | `3-2-4-2_PriorityDataset`      | 0   | -1  | 20    | Yes   |
+   | `3-2-4-3_SpatialScope`         | 0   | -1  | 30    | Yes   |
+   | `3-2-4-5_rndt-all1-fixed`      | 0   | -1  | 40    | Yes   |
 
-     | File   | max | Identifier |
-     |--------|-----|------------|
-     | `labels-i18n.rndt.rdf` | 0 | `labels-i18n` |
-     
-     Note that the labels thesaurus is incremental, and the various apps can add their own entries to it.
-     The default `thesaurus load` action is `create` (see the GeoNode thesaurus doc page linked above), so this file needs to be loaded using the `--action update` parameter, or it may raise an error since the thesaurus may already exist in GeoNode.     
+## Upgrading from 4.x
+
+- Custom metadata templates: replace `{% load metadata_tags %}` with `{% load rndt_tags %}`.
+- Thesauri: `thesaurus autoload` identifies them by file name (see the table above, plus `ConditionsApplyingToAccessAndUse`,
+  `LimitationsOnPublicAccess`, `labels-i18n`). Check the existing ones with `python manage.py thesaurus list`:
+  if they were loaded with different identifiers, rename them in the Thesaurus admin page before the first autoload,
+  or they will be loaded twice.
+- Dataset uuids: datasets of groups that got their first PA before this version may lack the iPA prefix,
+  so they are missing from `catalogue/csw/<iPA code>`. Check with `python manage.py rndt_uuids check`,
+  then fix with `python manage.py rndt_uuids fix`; both accept a list of dataset ids or uuids to limit them.
+
+## Endpoints
+
+- `catalogue/csw/<iPA code>`: CSW limited to the resources of one Pubblica Amministrazione
+- `api/pubblica_amministrazione/`: the list of the Pubbliche Amministrazioni
+
+## Testing
+
+The tests need GeoNode installed in the current environment, but no database. From the repository root:
+
+```bash
+python -m tests.run
+```
+
+CI runs them on every PR against GeoNode `5.1.1` and `master` (see `.github/workflows/tests.yml`).
+
+Linting and formatting are done by [ruff](https://docs.astral.sh/ruff/) (configured in `pyproject.toml`, version pinned in the `dev` extra):
+
+```bash
+pip install -e ".[dev]"
+ruff check .
+ruff format --check .
+```
 
 ## Uninstalling
 

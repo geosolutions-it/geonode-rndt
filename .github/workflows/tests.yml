@@ -1,0 +1,62 @@
+name: Tests
+
+on:
+  pull_request:
+  push:
+    branches: [master]
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lint:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+      # the ruff version pinned in the dev dependencies; configuration in pyproject.toml
+      - run: pip install "$(grep -oE '"ruff==[^"]+"' pyproject.toml | tr -d '"')"
+      - run: ruff check .
+      - run: ruff format --check .
+
+  tests:
+    name: GeoNode ${{ matrix.geonode }}
+    runs-on: ubuntu-24.04
+    # the base image provides the GDAL version pinned by each GeoNode release
+    container: geonode/geonode-base:${{ matrix.base }}
+    env:
+      DJANGO_SETTINGS_MODULE: tests.settings
+      PYTHONPATH: .  # steps run in the checkout: makes tests.settings importable
+      # required by GeoNode settings, no connection is opened
+      DATABASE_URL: postgis://user:pass@localhost:5432/geonode
+      GEODATABASE_URL: postgis://user:pass@localhost:5432/geonode_data
+      SITEURL: http://localhost:8000/
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - geonode: "5.1.1"
+            base: latest-ubuntu-24.04
+          - geonode: master
+            base: latest-ubuntu-26.04
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Install GeoNode ${{ matrix.geonode }}
+        run: |
+          apt-get update -y && apt-get install -y --no-install-recommends git
+          pip install "GeoNode @ git+https://github.com/GeoNode/geonode.git@${{ matrix.geonode }}"
+
+      - name: Install rndt
+        run: pip install -e .
+
+      - name: Django system checks
+        run: django-admin check --fail-level WARNING
+
+      - name: Run tests
+        run: python -m tests.run

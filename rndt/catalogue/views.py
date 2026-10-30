@@ -1,6 +1,8 @@
+from django.views.decorators.csrf import csrf_exempt
 from geonode.catalogue.views import csw_global_dispatch
 
 
+@csrf_exempt
 def csw_dispatcher(request, pa_code):
     return csw_global_dispatch(
         request,
@@ -14,7 +16,7 @@ class LayerFilters:
         self.pa_code = pa_code
 
     def filter_layers(self, layers):
-        return layers.filter(uuid__startswith=self.pa_code)
+        return layers.filter(uuid__startswith=f"{self.pa_code}:")
 
 
 class RndtCswConfigurer:

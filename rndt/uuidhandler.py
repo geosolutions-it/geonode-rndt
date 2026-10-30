@@ -17,10 +17,18 @@ class UUIDHandler:
         if not self.instance.uuid:
             return self._create_uuid_from_scratch(group_ipa)
 
+        newuuid = self.uuid_for_ipa(group_ipa)
+        self.delete_old_metadata_links()
+        return newuuid
+
+    def uuid_for_ipa(self, group_ipa):
+        """The existing uuid (a new one if missing), prefixed by group_ipa (or by nothing if None); no side effects"""
+        if not self.instance.uuid:
+            return self._create_uuid_from_scratch(group_ipa)
         previous_ipa = self.extract_ipa_from_uuid(self.instance.uuid)
         if not group_ipa:
             newuuid = self.remove_ipa_from_uuid(self.instance.uuid)
-        elif group_ipa in self.instance.uuid:
+        elif self.instance.uuid.startswith(f"{group_ipa}:"):
             newuuid = self.instance.uuid
         elif previous_ipa:
             if group_ipa == previous_ipa:
@@ -29,7 +37,6 @@ class UUIDHandler:
                 newuuid = self.replace_uuid(group_ipa, previous_ipa, self.instance.uuid)
         else:
             newuuid = f"{group_ipa}:{self.instance.uuid}"
-        self.delete_old_metadata_links()
         return newuuid[:36]
 
     def get_group_ipa(self):
@@ -46,11 +53,11 @@ class UUIDHandler:
         if not self.instance.uuid and not group_ipa:
             return f"{uuid.uuid1()}"
         elif not self.instance.uuid and group_ipa:
-            return f"{group_ipa}:{uuid.uuid1()}"
+            return f"{group_ipa}:{uuid.uuid1()}"[:36]
 
     @staticmethod
     def replace_uuid(new_ipa, old_ipa, str_to_replace):
-        return re.sub(old_ipa, new_ipa, str_to_replace)[:36]
+        return re.sub(rf"^{re.escape(old_ipa)}:", f"{new_ipa}:", str_to_replace)[:36]
 
     @staticmethod
     def extract_ipa_from_uuid(instance_uuid):

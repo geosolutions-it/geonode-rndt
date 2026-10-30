@@ -40,22 +40,17 @@ rndt = [
     'locale/*/LC_MESSAGES/*.mo',
     'metadata/data/*.csv',
     'metadata/schemas/*.json',
+    'static/rndt/*.xsl',
     'templates/xml/*.xml',
     'thesauri/*.rdf',
 ]
 
 [project.optional-dependencies]
 dev = [
-    "ruff",
-    "black",
+    "ruff==0.17.3",  # lints and formats: CI installs this version
     "build",
     "pytest",
 ]
-
-[tool.black]
-line-length = 120
-target-version = ['py310']
-force-exclude = 'rndt/migrations/|node_modules|static'
 
 [tool.ruff]
 line-length = 120
@@ -65,6 +60,14 @@ extend-exclude = [
     "node_modules",
     "static",
 ]
+# exclude those paths even when files are passed explicitly (IDEs, pre-commit)
+force-exclude = true
+
+[tool.ruff.format]
+# Black-compatible formatting, replaces black
+quote-style = "double"
+indent-style = "space"
+line-ending = "lf"
 
 [tool.ruff.lint]
 # E and F are the standard Flake8 rules
